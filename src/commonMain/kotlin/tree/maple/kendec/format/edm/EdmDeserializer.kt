@@ -53,7 +53,7 @@ open class EdmDeserializer(serialized: EdmElement<*>?) : RecursiveDeserializer<E
         return value!!.cast()
     }
 
-    override fun <V> readOptional(ctx: SerializationContext, endec: Endec<V>): Optional<V> {
+    override fun <V> readOptional(ctx: SerializationContext, endec: Endec<V>): Optional<V & Any> {
         val optional = value!!.cast<Optional<EdmElement<*>>>()
         return if (optional.isPresent()) {
             frame(

@@ -56,7 +56,7 @@ open class ForwardingSerializer<T> protected constructor(private val delegate: S
         delegate.writeBytes(ctx, bytes)
     }
 
-    override fun <V> writeOptional(ctx: SerializationContext, endec: Endec<V>, optional: Optional<V>) {
+    override fun <V> writeOptional(ctx: SerializationContext, endec: Endec<V>, optional: Optional<V & Any>) {
         delegate.writeOptional(ctx, endec, optional)
     }
 

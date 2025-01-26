@@ -50,5 +50,11 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
+        val jvmMain by getting {
+            dependencies {
+                implementation("com.google.code.gson:gson:2.10.1")
+            }
+        }
+
     }
 }

@@ -20,7 +20,7 @@ interface Deserializer<T> {
     fun readBoolean(ctx: SerializationContext): Boolean
     fun readString(ctx: SerializationContext): String
     fun readBytes(ctx: SerializationContext): ByteArray
-    fun <V> readOptional(ctx: SerializationContext, endec: Endec<V>): Optional<V>
+    fun <V> readOptional(ctx: SerializationContext, endec: Endec<V>): Optional<V & Any>
 
     fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>): Sequence<E>
     fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>): Map<V>
@@ -57,6 +57,6 @@ interface Deserializer<T> {
             ctx: SerializationContext,
             endec: Endec<F>,
             defaultValueFactory: (() -> F)?
-        ): F?
+        ): F
     }
 }

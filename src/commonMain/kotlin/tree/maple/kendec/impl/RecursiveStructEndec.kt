@@ -21,7 +21,7 @@ class RecursiveStructEndec<T>(builder: (StructEndec<T>) -> StructEndec<T>) : Str
         ctx: SerializationContext,
         deserializer: Deserializer<*>,
         struct: Deserializer.Struct
-    ): T? {
+    ): T {
         return structEndec.decodeStruct(ctx, deserializer, struct)
     }
 }

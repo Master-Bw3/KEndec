@@ -102,9 +102,9 @@ interface Endec<T> {
      * Create a new endec which serializes an optional value
      * serialized using this endec
      */
-    fun optionalOf(): Endec<Optional<T>> {
+    fun optionalOf(): Endec<Optional<T & Any>> {
         return of(
-            { ctx: SerializationContext, serializer: Serializer<*>, value: Optional<T> ->
+            { ctx: SerializationContext, serializer: Serializer<*>, value: Optional<T & Any> ->
                 serializer.writeOptional(
                     ctx,
                     this,
@@ -225,7 +225,7 @@ interface Endec<T> {
     fun nullableOf(): Endec<T?> {
         return optionalOf().xmap(
             { o -> o.orElse(null) },
-            { value -> OptionalOfNullable(value) as Optional<T> })
+            { value -> OptionalOfNullable(value) })
     }
 
     // --- Conversion ---
@@ -282,12 +282,14 @@ interface Endec<T> {
         return StructField(name, this, getter)
     }
 
-    fun <S> optionalFieldOf(name: String, getter: (S) -> T, defaultValue: () -> T): StructField<S, T> {
+    fun <S> optionalFieldOf(name: String, getter: (S) -> T?, defaultValue: () -> T & Any): StructField<S, T?> {
         return StructField(
             name,
             optionalOf().xmap(
                 { optional -> optional.orElseGet(defaultValue) },
-                { value: T -> OptionalOfNullable(value) }), getter, defaultValue
+                { value -> OptionalOfNullable(value) }),
+            { key -> key?.let(getter) } ,
+            defaultValue
         )
     }
 
@@ -342,10 +344,10 @@ interface Endec<T> {
          */
         fun <K, V> map(keyEndec: Endec<K?>, valueEndec: Endec<V?>): Endec<Map<K?, V?>> {
             return StructEndecBuilder.of(
-                keyEndec.fieldOf<Pair<K?, V?>>("k") { it.first },
-                valueEndec.fieldOf<Pair<K?, V?>>("v") { it.second }
-            ) { k: K?, v: V? -> k to v }.listOf().xmap({ entries: List<Pair<K?, V?>> ->
-                entries.toMap()
+                keyEndec.fieldOf("k") { it?.first },
+                valueEndec.fieldOf("v") { it?.second }
+            ) { k: K?, v: V? -> k to v }.listOf().xmap({ entries: List<Pair<K?, V?>?> ->
+                entries.filterNotNull().toMap()
             }, { kvMap: Map<K?, V?> -> kvMap.entries.toList().map { it.key to it.value } })
         }
 
@@ -487,7 +489,7 @@ interface Endec<T> {
                     ctx: SerializationContext,
                     deserializer: Deserializer<*>,
                     struct: Deserializer.Struct
-                ): T? {
+                ): T {
                     val variant = struct.field(variantKey, ctx, variantEndec, null)
                     return variantToEndec(variant).decodeStruct(ctx, deserializer, struct)
                 }
@@ -524,7 +526,7 @@ interface Endec<T> {
                     ctx: SerializationContext,
                     deserializer: Deserializer<*>,
                     struct: Deserializer.Struct
-                ): T? {
+                ): T {
                     val variant = struct.field("variant", ctx, variantEndec, null)
                     return struct.field("instance", ctx, variantToEndec(variant), null)
                 }

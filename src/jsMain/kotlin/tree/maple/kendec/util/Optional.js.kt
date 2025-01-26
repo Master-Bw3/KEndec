@@ -32,9 +32,9 @@ actual fun <T> Optional<T>.orElseGet(other: () -> T): T {
 actual fun <V : Any> OptionalOf(value: V): Optional<V> {
     TODO()
 }
-actual fun <V> OptionalOfEmpty(): Optional<V> {
+actual fun <V> OptionalOfEmpty(): Optional<V & Any> {
     TODO()
 }
-actual fun <V> OptionalOfNullable(value: V): Optional<V> {
+actual fun <V> OptionalOfNullable(value: V): Optional<V & Any> {
     TODO()
 }

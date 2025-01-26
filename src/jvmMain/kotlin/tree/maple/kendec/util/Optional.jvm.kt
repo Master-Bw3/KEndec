@@ -28,10 +28,10 @@ actual fun <V : Any> OptionalOf(value: V): Optional<V> {
     return java.util.Optional.of(value)
 }
 
-actual fun <V> OptionalOfEmpty(): Optional<V> {
-    return java.util.Optional.empty<V>() as Optional<V>
+actual fun <V> OptionalOfEmpty(): Optional<V & Any> {
+    return java.util.Optional.empty<V>()
 }
 
-actual fun <V> OptionalOfNullable(value: V): Optional<V> {
-    return java.util.Optional.ofNullable(value) as Optional<V>
+actual fun <V> OptionalOfNullable(value: V): Optional<V & Any> {
+    return java.util.Optional.ofNullable(value)
 }

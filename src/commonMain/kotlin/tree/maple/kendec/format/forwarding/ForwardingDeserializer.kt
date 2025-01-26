@@ -53,7 +53,7 @@ open class ForwardingDeserializer<T> protected constructor(private val delegate:
         return delegate.readBytes(ctx)
     }
 
-    override fun <V> readOptional(ctx: SerializationContext, endec: Endec<V>): Optional<V> {
+    override fun <V> readOptional(ctx: SerializationContext, endec: Endec<V>): Optional<V & Any> {
         return delegate.readOptional(ctx, endec)
     }
 

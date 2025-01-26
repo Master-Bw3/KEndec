@@ -22,7 +22,7 @@ interface Serializer<T> {
     fun writeString(ctx: SerializationContext, value: String)
     fun writeBytes(ctx: SerializationContext, bytes: ByteArray)
 
-    fun <V> writeOptional(ctx: SerializationContext, endec: Endec<V>, optional: Optional<V>)
+    fun <V> writeOptional(ctx: SerializationContext, endec: Endec<V>, optional: Optional<V & Any>)
 
     fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>, size: Int): Sequence<E>
     fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>, size: Int): Map<V>

@@ -55,7 +55,7 @@ class EdmSerializer : RecursiveSerializer<EdmElement<*>?>(null), SelfDescribedSe
         this.consume(EdmElement.bytes(bytes))
     }
 
-    override fun <V> writeOptional(ctx: SerializationContext, endec: Endec<V>, optional: Optional<V>) {
+    override fun <V> writeOptional(ctx: SerializationContext, endec: Endec<V>, optional: Optional<V & Any>) {
         val result: Array<EdmElement<*>?> = arrayOfNulls(1)
         this.frame { encoded ->
             optional.ifPresent { v: V -> endec.encode(ctx, this, v) }

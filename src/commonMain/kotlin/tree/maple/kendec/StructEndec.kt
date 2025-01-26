@@ -14,7 +14,7 @@ import tree.maple.kendec.impl.StructField
 interface StructEndec<T> : Endec<T> {
     fun encodeStruct(ctx: SerializationContext, serializer: Serializer<*>, struct: Serializer.Struct, value: T)
 
-    fun decodeStruct(ctx: SerializationContext, deserializer: Deserializer<*>, struct: Deserializer.Struct): T?
+    fun decodeStruct(ctx: SerializationContext, deserializer: Deserializer<*>, struct: Deserializer.Struct): T
 
     override fun encode(ctx: SerializationContext, serializer: Serializer<*>, value: T) {
         serializer.struct().use { struct ->
@@ -114,7 +114,7 @@ interface StructEndec<T> : Endec<T> {
     }
 
     fun interface StructuredDecoder<T> {
-        fun decodeStruct(ctx: SerializationContext, deserializer: Deserializer<*>, struct: Deserializer.Struct): T?
+        fun decodeStruct(ctx: SerializationContext, deserializer: Deserializer<*>, struct: Deserializer.Struct): T
     }
 
     fun interface StructuredDecoderWithError<T> {
@@ -148,7 +148,7 @@ interface StructEndec<T> : Endec<T> {
                     ctx: SerializationContext,
                     deserializer: Deserializer<*>,
                     struct: Deserializer.Struct
-                ): T? {
+                ): T {
                     return decoder.decodeStruct(ctx, deserializer, struct)
                 }
             }

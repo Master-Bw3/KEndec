@@ -35,9 +35,9 @@ open class StructField<S, F> @JvmOverloads constructor(
         }
     }
 
-    open fun decodeField(ctx: SerializationContext, deserializer: Deserializer<*>, struct: Deserializer.Struct): F? {
+    open fun decodeField(ctx: SerializationContext, deserializer: Deserializer<*>, struct: Deserializer.Struct): F {
         try {
-            return struct.field(this.name, ctx, this.endec, this.defaultValueFactory)
+            return struct.field(this.name, ctx, this.endec, this.defaultValueFactory) ?: throw NullPointerException()
         } catch (e: Exception) {
             throw StructFieldException(
                 "Exception occurred when decoding a given StructField: [Field: " + this.name + "]",
@@ -65,7 +65,7 @@ open class StructField<S, F> @JvmOverloads constructor(
             ctx: SerializationContext,
             deserializer: Deserializer<*>,
             struct: Deserializer.Struct
-        ): F? {
+        ): F {
             return endec().decodeStruct(ctx, deserializer, struct)
         }
     }

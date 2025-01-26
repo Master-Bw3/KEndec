@@ -43,7 +43,7 @@ class LenientEdmDeserializer protected constructor(serialized: EdmElement<*>?) :
         return super.readBoolean(ctx)
     }
 
-    override fun <V> readOptional(ctx: SerializationContext, endec: Endec<V>): Optional<V> {
+    override fun <V> readOptional(ctx: SerializationContext, endec: Endec<V>): Optional<V & Any> {
         val edmElement = this.value
 
         return if (edmElement == null) {

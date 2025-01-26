@@ -17,5 +17,5 @@ expect fun <T> Optional<T>.orElse(other: T?): T?
 expect fun <T> Optional<T>.orElseGet(other: () -> T): T
 
 expect fun <V : Any> OptionalOf(value: V): Optional<V>
-expect fun <V> OptionalOfEmpty(): Optional<V>
-expect fun <V> OptionalOfNullable(value: V): Optional<V>
+expect fun <V> OptionalOfEmpty(): Optional<V & Any>
+expect fun <V> OptionalOfNullable(value: V): Optional<V & Any>
