@@ -2,6 +2,7 @@ package tree.maple.kendec.format.edm
 
 import okio.Buffer
 import okio.IOException
+import okio.internal.commonAsUtf8ToByteArray
 import tree.maple.kendec.util.Optional
 import tree.maple.kendec.util.OptionalOf
 import tree.maple.kendec.util.OptionalOfEmpty
@@ -29,7 +30,11 @@ object EdmIo {
             EdmElement.Type.F32 -> output.writeInt(data.cast<Float>().toRawBits())
             EdmElement.Type.F64 -> output.writeLong(data.cast<Double>().toRawBits())
             EdmElement.Type.BOOLEAN -> output.writeByte(if (data.cast<Boolean>()) 1 else 0)
-            EdmElement.Type.STRING -> output.writeUtf8(data.cast())
+            EdmElement.Type.STRING ->{
+                val str = data.cast<String>()
+                output.writeLong(str.commonAsUtf8ToByteArray().size.toLong())
+                output.writeUtf8(str)
+            }
             EdmElement.Type.BYTES -> {
                 output.writeInt(data.cast<ByteArray>().size)
                 output.write(data.cast<ByteArray>())
@@ -64,6 +69,7 @@ object EdmIo {
 
                 output.writeInt(map.size)
                 for ((key, value) in map) {
+                    output.writeLong(key.commonAsUtf8ToByteArray().size.toLong())
                     output.writeUtf8(key)
 
                     output.writeByte(value.type().ordinal)
@@ -87,7 +93,10 @@ object EdmIo {
             EdmElement.Type.F32 -> EdmElement.f32(Float.fromBits(input.readInt()))
             EdmElement.Type.F64 -> EdmElement.f64(Double.fromBits(input.readLong()))
             EdmElement.Type.BOOLEAN -> EdmElement.bool(input.readByte() == 1.toByte())
-            EdmElement.Type.STRING -> EdmElement.string(input.readUtf8())
+            EdmElement.Type.STRING ->  {
+                val length = input.readLong()
+                EdmElement.string(input.readUtf8(length))
+            }
             EdmElement.Type.BYTES -> {
                 val result = ByteArray(input.readInt())
                 input.readFully(result)
@@ -130,7 +139,8 @@ object EdmIo {
                 val result = LinkedHashMap<String, EdmElement<*>>(length)
 
                 for (i in 0 until length) {
-                    result[input.readUtf8()] = decodeElementData(input, input.readByte())
+                    val keyLength = input.readLong()
+                    result[input.readUtf8(keyLength)] = decodeElementData(input, input.readByte())
                 }
 
                 EdmElement.consumeMap(result)

@@ -10,9 +10,6 @@ import tree.maple.kendec.format.gson.GsonDeserializer
 import tree.maple.kendec.format.gson.GsonEndec
 import tree.maple.kendec.format.gson.GsonSerializer
 import tree.maple.kendec.impl.StructEndecBuilder
-import tree.maple.kendec.impl.StructField
-import java.util.function.Consumer
-import java.util.function.Supplier
 
 class JsonTests {
     @Test

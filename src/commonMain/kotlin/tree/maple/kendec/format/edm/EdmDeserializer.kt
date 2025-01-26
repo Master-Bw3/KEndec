@@ -3,8 +3,8 @@ package tree.maple.kendec.format.edm
 import tree.maple.kendec.*
 import tree.maple.kendec.util.*
 
-open class EdmDeserializer(serialized: EdmElement<*>?) : RecursiveDeserializer<EdmElement<*>?>(serialized),
-    SelfDescribedDeserializer<EdmElement<*>?> {
+open class EdmDeserializer(serialized: EdmElement<*>) : RecursiveDeserializer<EdmElement<*>>(serialized),
+    SelfDescribedDeserializer<EdmElement<*>> {
     // ---
     override fun readByte(ctx: SerializationContext): Byte {
         return value!!.cast()

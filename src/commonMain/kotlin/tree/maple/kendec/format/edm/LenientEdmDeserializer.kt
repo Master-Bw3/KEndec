@@ -6,7 +6,7 @@ import tree.maple.kendec.util.OptionalOf
 import tree.maple.kendec.util.OptionalOfEmpty
 import tree.maple.kendec.util.OptionalOfNullable
 
-class LenientEdmDeserializer protected constructor(serialized: EdmElement<*>?) : EdmDeserializer(serialized) {
+class LenientEdmDeserializer protected constructor(serialized: EdmElement<*>) : EdmDeserializer(serialized) {
     // ---
     override fun readByte(ctx: SerializationContext): Byte {
         return value!!.cast<Number>().toByte()
@@ -75,7 +75,7 @@ class LenientEdmDeserializer protected constructor(serialized: EdmElement<*>?) :
     }
 
     companion object {
-        fun of(serialized: EdmElement<*>?): LenientEdmDeserializer {
+        fun of(serialized: EdmElement<*>): LenientEdmDeserializer {
             return LenientEdmDeserializer(serialized)
         }
     }
