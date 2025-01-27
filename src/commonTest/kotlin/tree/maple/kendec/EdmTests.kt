@@ -137,6 +137,7 @@ class EdmTests {
             })
         )
 
+
         assertEquals(edmElement, decodeEdmElement(encodeEdmElement(edmElement)))
     }
 

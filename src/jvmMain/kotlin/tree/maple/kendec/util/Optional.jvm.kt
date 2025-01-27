@@ -2,8 +2,6 @@ package tree.maple.kendec.util
 
 actual typealias Optional<T> = java.util.Optional<T>
 
-actual fun <T> Optional<T>.get(): T = this.get()
-
 actual fun <T, U : Any> Optional<T>.map(mapper: (T) -> U): Optional<U> {
     return this.map(mapper)
 }

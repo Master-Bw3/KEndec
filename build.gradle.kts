@@ -21,7 +21,7 @@ kotlin {
         }
 
     }
-    js {
+    js(IR) {
         browser()
         nodejs()
 
@@ -34,7 +34,6 @@ kotlin {
         }
 
         dependencies {
-            npm("prelude-ts", "1.0.6")
         }
     }
     sourceSets {
