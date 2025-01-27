@@ -351,29 +351,29 @@ interface Endec<T> {
             }, { kvMap: Map<K?, V?> -> kvMap.entries.toList().map { it.key to it.value } })
         }
 
-//        /**
-//         * Create a new endec which serializes a map from keys encoded as strings using
-//         * `keyToString` and decoded using `stringToKey` to values serialized
-//         * using `valueEndec`
-//         */
-//        fun <K, V> map(
-//            keyToString: Function<K, String>,
-//            stringToKey: Function<String, K>,
-//            valueEndec: Endec<V>?
-//        ): Endec<Map<K, V>>? {
-//            return of(Encoder { ctx: SerializationContext?, serializer: Serializer<*>, map: Map<K, V> ->
-//                serializer.map(ctx, valueEndec, map.size).use { mapState ->
-//                    map.forEach { (k: K, v: V) -> mapState.entry(keyToString.apply(k), v) }
-//                }
-//            }, Decoder { ctx: SerializationContext?, deserializer: Deserializer<*> ->
-//                val mapState = deserializer.map(ctx, valueEndec)
-//                val map = HashMap<K, V>(mapState.estimatedSize())
-//                mapState.forEachRemaining { entry: Map.Entry<String?, V> ->
-//                    map[stringToKey.apply(entry.key)] = entry.value
-//                }
-//                map
-//            })
-//        }
+        /**
+         * Create a new endec which serializes a map from keys encoded as strings using
+         * `keyToString` and decoded using `stringToKey` to values serialized
+         * using `valueEndec`
+         */
+        fun <K, V> map(
+            keyToString: (K) -> String,
+            stringToKey: (String) -> K,
+            valueEndec: Endec<V>
+        ): Endec<Map<K, V>> {
+            return of({ ctx: SerializationContext, serializer: Serializer<*>, map: Map<K, V> ->
+                serializer.map(ctx, valueEndec, map.size).use { mapState ->
+                    map.forEach { (k: K, v: V) -> mapState.entry(keyToString(k), v) }
+                }
+            }, { ctx: SerializationContext, deserializer: Deserializer<*> ->
+                val mapState = deserializer.map(ctx, valueEndec)
+                val map = HashMap<K, V>(mapState.estimatedSize())
+                mapState.forEach { entry: Map.Entry<String, V> ->
+                    map[stringToKey(entry.key)] = entry.value
+                }
+                map
+            })
+        }
 
         /**
          * Create a new endec which serializes the enum constants of `enumClass`
