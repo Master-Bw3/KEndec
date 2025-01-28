@@ -33,6 +33,10 @@ kotlin {
             }
         }
 
+        compilations["main"].packageJson {
+            customField("types", "kotlin/KEndec.d.ts")
+        }
+
         dependencies {
         }
     }
