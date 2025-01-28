@@ -5,8 +5,10 @@ package tree.maple.kendec
 import tree.maple.kendec.impl.*
 import tree.maple.kendec.util.*
 import tree.maple.kendec.util.getEnumConstants
+import kotlin.js.ExperimentalJsCollectionsApi
 import kotlin.js.JsExport
 import kotlin.js.JsName
+import kotlin.js.JsStatic
 import kotlin.reflect.KClass
 
 /**
@@ -300,13 +302,10 @@ interface Endec<T> {
     }
 }
 
-fun interface Encoder<T> {
-    fun encode(ctx: SerializationContext, serializer: Serializer<*>, value: T)
-}
 
-fun interface Decoder<T> {
-    fun decode(ctx: SerializationContext, deserializer: Deserializer<*>): T
-}
+typealias Encoder<T> = (ctx: SerializationContext, serializer: Serializer<*>, value: T) -> Unit
+
+typealias Decoder<T> = (ctx: SerializationContext, deserializer: Deserializer<*>) -> T
 
 fun interface DecoderWithError<T> {
     fun decode(ctx: SerializationContext, serializer: Deserializer<*>, exception: Exception): T
@@ -316,11 +315,11 @@ fun interface DecoderWithError<T> {
 fun <T> endecOf(encoder: Encoder<T>, decoder: Decoder<T>): Endec<T> {
     return object : Endec<T> {
         override fun encode(ctx: SerializationContext, serializer: Serializer<*>, value: T) {
-            encoder.encode(ctx, serializer, value)
+            encoder(ctx, serializer, value)
         }
 
         override fun decode(ctx: SerializationContext, deserializer: Deserializer<*>): T {
-            return decoder.decode(ctx, deserializer)
+            return decoder(ctx, deserializer)
         }
     }
 }
@@ -582,89 +581,104 @@ fun <N> Endec<N>.ranged(
 }
 
 // --- Serializer Primitives ---
-object PrimitiveEndecs {
-    val VOID: Endec<Unit> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, unused: Unit -> },
-        { ctx: SerializationContext, deserializer: Deserializer<*> -> null })
+class PrimitiveEndecs {
+    companion object {
+        @JsStatic
+        val VOID: Endec<Unit> = endecOf(
+            { ctx: SerializationContext, serializer: Serializer<*>, unused: Unit -> },
+            { ctx: SerializationContext, deserializer: Deserializer<*> -> null })
 
-    val BOOLEAN: Endec<Boolean> =
-        endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Boolean ->
-            serializer.writeBoolean(
+        @JsStatic
+        val BOOLEAN: Endec<Boolean> =
+            endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Boolean ->
+                serializer.writeBoolean(
+                    ctx,
+                    value
+                )
+            }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readBoolean(ctx) })
+
+        @JsStatic
+        val BYTE: Endec<Byte> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Byte ->
+            serializer.writeByte(
                 ctx,
                 value
             )
-        }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readBoolean(ctx) })
+        }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readByte(ctx) })
 
-    val BYTE: Endec<Byte> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Byte ->
-        serializer.writeByte(
-            ctx,
-            value
-        )
-    }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readByte(ctx) })
-
-    val SHORT: Endec<Short> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Short ->
-        serializer.writeShort(
-            ctx,
-            value
-        )
-    }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readShort(ctx) })
-
-    val INT: Endec<Int> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Int ->
-        serializer.writeInt(
-            ctx,
-            value
-        )
-    }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readInt(ctx) })
-
-    val VAR_INT: Endec<Int> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Int ->
-        serializer.writeVarInt(
-            ctx,
-            value
-        )
-    }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readVarInt(ctx) })
-
-    val LONG: Endec<Long> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Long ->
-        serializer.writeLong(
-            ctx,
-            value
-        )
-    }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readLong(ctx) })
-
-    val VAR_LONG: Endec<Long> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Long ->
-        serializer.writeVarLong(
-            ctx,
-            value
-        )
-    }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readVarLong(ctx) })
-
-    val FLOAT: Endec<Float> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Float ->
-        serializer.writeFloat(
-            ctx,
-            value
-        )
-    }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readFloat(ctx) })
-
-    val DOUBLE: Endec<Double> =
-        endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Double ->
-            serializer.writeDouble(
+        @JsStatic
+        val SHORT: Endec<Short> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Short ->
+            serializer.writeShort(
                 ctx,
                 value
             )
-        }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readDouble(ctx) })
+        }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readShort(ctx) })
 
-    val STRING: Endec<String> =
-        endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: String ->
-            serializer.writeString(
+        @JsStatic
+        val INT: Endec<Int> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Int ->
+            serializer.writeInt(
                 ctx,
                 value
             )
-        }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readString(ctx) })
+        }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readInt(ctx) })
 
-    val BYTES: Endec<ByteArray> =
-        endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: ByteArray ->
-            serializer.writeBytes(
+        @JsStatic
+        val VAR_INT: Endec<Int> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Int ->
+            serializer.writeVarInt(
                 ctx,
                 value
             )
-        }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readBytes(ctx) })
+        }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readVarInt(ctx) })
+
+        @JsStatic
+        val LONG: Endec<Long> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Long ->
+            serializer.writeLong(
+                ctx,
+                value
+            )
+        }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readLong(ctx) })
+
+        @JsStatic
+        val VAR_LONG: Endec<Long> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Long ->
+            serializer.writeVarLong(
+                ctx,
+                value
+            )
+        }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readVarLong(ctx) })
+
+        @JsStatic
+        val FLOAT: Endec<Float> = endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Float ->
+            serializer.writeFloat(
+                ctx,
+                value
+            )
+        }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readFloat(ctx) })
+
+        @JsStatic
+        val DOUBLE: Endec<Double> =
+            endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: Double ->
+                serializer.writeDouble(
+                    ctx,
+                    value
+                )
+            }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readDouble(ctx) })
+
+        @JsStatic
+        val STRING: Endec<String> =
+            endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: String ->
+                serializer.writeString(
+                    ctx,
+                    value
+                )
+            }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readString(ctx) })
+
+        @JsStatic
+        val BYTES: Endec<ByteArray> =
+            endecOf({ ctx: SerializationContext, serializer: Serializer<*>, value: ByteArray ->
+                serializer.writeBytes(
+                    ctx,
+                    value
+                )
+            }, { ctx: SerializationContext, deserializer: Deserializer<*> -> deserializer.readBytes(ctx) })
+    }
 }
 

@@ -4,6 +4,7 @@
 package tree.maple.kendec
 
 import kotlin.js.JsExport
+import kotlin.js.JsStatic
 
 abstract class SerializationAttribute protected constructor(val name: String) {
     class Marker(name: String) : SerializationAttribute(name), Instance {
@@ -36,10 +37,13 @@ abstract class SerializationAttribute protected constructor(val name: String) {
     }
 
     companion object {
+
+        @JsStatic
         fun marker(name: String): Marker {
             return Marker(name)
         }
 
+        @JsStatic
         fun <T> withValue(name: String): WithValue<T> {
             return WithValue(name)
         }

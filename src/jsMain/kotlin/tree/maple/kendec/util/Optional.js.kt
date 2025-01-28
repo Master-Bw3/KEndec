@@ -1,7 +1,6 @@
-@file:JsExport
 package tree.maple.kendec.util
 
-
+@JsExport
 actual class Optional<T> private  constructor(val value: T? = null){
 
     actual fun get(): T {
@@ -55,14 +54,18 @@ actual class Optional<T> private  constructor(val value: T? = null){
     }
 
     companion object {
+
+        @JsStatic
         fun <V : Any> of(value: V): Optional<V> {
             return Optional(value)
         }
 
+        @JsStatic
         fun <V> empty(): Optional<V & Any> {
             return Optional()
         }
 
+        @JsStatic
         fun <V> ofNullable(value: V): Optional<V & Any> {
             return if (value == null) {
                 Optional()
