@@ -1,5 +1,8 @@
+@file:JsExport
 package tree.maple.kendec.util
 
+import kotlin.js.JsExport
+import kotlin.js.JsName
 import kotlin.jvm.JvmOverloads
 import kotlin.math.max
 
@@ -15,6 +18,8 @@ class BlockWriter {
         return this
     }
 
+
+    @JsName("writeEmptyln")
     fun writeln(): BlockWriter {
         this.writeln("")
 
@@ -45,6 +50,7 @@ class BlockWriter {
         return this
     }
 
+    @JsName("writeIndentedBlock")
     fun writeBlock(startDelimiter: String, endDelimiter: String, consumer: (BlockWriter) -> Unit): BlockWriter {
         return writeBlock(startDelimiter, endDelimiter, true, consumer)
     }

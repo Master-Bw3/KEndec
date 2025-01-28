@@ -1,6 +1,9 @@
+@file:JsExport
+
 package tree.maple.kendec
 
 import tree.maple.kendec.util.Optional
+import kotlin.js.JsExport
 
 interface Deserializer<T> {
     fun setupContext(ctx: SerializationContext): SerializationContext {

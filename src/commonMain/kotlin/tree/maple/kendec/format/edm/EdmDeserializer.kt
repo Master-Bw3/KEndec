@@ -1,7 +1,9 @@
+@file:JsExport
 package tree.maple.kendec.format.edm
 
 import tree.maple.kendec.*
 import tree.maple.kendec.util.*
+import kotlin.js.JsExport
 
 open class EdmDeserializer(serialized: EdmElement<*>) : RecursiveDeserializer<EdmElement<*>>(serialized),
     SelfDescribedDeserializer<EdmElement<*>> {

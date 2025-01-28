@@ -1,10 +1,12 @@
+@file:JsExport
+
 package tree.maple.kendec
 
-import tree.maple.kendec.Endec.Decoder
-import tree.maple.kendec.Endec.Encoder
 import tree.maple.kendec.impl.*
 import tree.maple.kendec.util.*
 import tree.maple.kendec.util.getEnumConstants
+import kotlin.js.JsExport
+import kotlin.js.JsName
 import kotlin.reflect.KClass
 
 /**
@@ -36,6 +38,7 @@ interface Endec<T> {
      * Create a new serializer with result type `E`, call [.encode]
      * once for the provided `value` and return the serializer's [result][Serializer.result]
      */
+    @JsName("encodeFullyWithCtx")
     fun <E> encodeFully(ctx: SerializationContext, serializerConstructor: () -> Serializer<E>, value: T): E {
         val serializer = serializerConstructor()
         this.encode(serializer.setupContext(ctx), serializer, value)
@@ -51,6 +54,7 @@ interface Endec<T> {
      * Create a new deserializer by calling `deserializerConstructor` with `value`
      * and return the result of [.decode]
      */
+    @JsName("decodeFullyWithCtx")
     fun <E> decodeFully(
         ctx: SerializationContext,
         deserializerConstructor: (E) -> Deserializer<E>,
@@ -250,6 +254,7 @@ interface Endec<T> {
      *
      * If `T` is of an immutable type, you almost always want to use [.keyed] instead
      */
+    @JsName("keyedFromSupplier")
     fun keyed(key: String, defaultValueFactory: () -> T): KeyedEndec<T> {
         return KeyedEndec(key, this, defaultValueFactory)
     }
@@ -293,18 +298,18 @@ interface Endec<T> {
             defaultValue
         )
     }
+}
 
-    fun interface Encoder<T> {
-        fun encode(ctx: SerializationContext, serializer: Serializer<*>, value: T)
-    }
+fun interface Encoder<T> {
+    fun encode(ctx: SerializationContext, serializer: Serializer<*>, value: T)
+}
 
-    fun interface Decoder<T> {
-        fun decode(ctx: SerializationContext, deserializer: Deserializer<*>): T
-    }
+fun interface Decoder<T> {
+    fun decode(ctx: SerializationContext, deserializer: Deserializer<*>): T
+}
 
-    fun interface DecoderWithError<T> {
-        fun decode(ctx: SerializationContext, serializer: Deserializer<*>, exception: Exception): T
-    }
+fun interface DecoderWithError<T> {
+    fun decode(ctx: SerializationContext, serializer: Deserializer<*>, exception: Exception): T
 }
 
 // --- Constructors ---
@@ -328,6 +333,7 @@ fun <T> unitEndecOf(instance: T): StructEndec<T> {
     return unitEndecOf { instance }
 }
 
+@JsName("unitEndecFromSupplier")
 fun <T> unitEndecOf(instance: () -> T): StructEndec<T> {
     return structEndecOf(
         { ctx: SerializationContext, serializer: Serializer<*>, struct: StructSerializer, value: T -> },
@@ -357,6 +363,7 @@ fun <K, V> mapEndecOf(keyEndec: Endec<K?>, valueEndec: Endec<V?>): Endec<Map<K?,
  * `keyToString` and decoded using `stringToKey` to values serialized
  * using `valueEndec`
  */
+@JsName("stringMapEndecOf")
 fun <K, V> mapEndecOf(
     keyToString: (K) -> String,
     stringToKey: (String) -> K,
@@ -395,18 +402,6 @@ fun <E : Enum<E>> enumEndecOf(enumClass: KClass<E>): Endec<E> {
 }
 
 // ---
-/**
- * Shorthand for [.dispatchedStruct]
- * which always uses `type` as the `variantKey`
- */
-fun <T, K> dispatchedStructEndecOf(
-    variantToEndec: (K?) -> StructEndec<out T>,
-    instanceToVariant: (T) -> K,
-    variantEndec: Endec<K>
-): StructEndec<out T> {
-    return dispatchedStructEndecOf(variantToEndec, instanceToVariant, variantEndec, "type")
-}
-
 /**
  * Create a new struct-dispatch endec which serializes variants of the struct `T`
  *
@@ -471,7 +466,7 @@ fun <T, K> dispatchedStructEndecOf(
     variantToEndec: (K?) -> StructEndec<out T>,
     instanceToVariant: (T) -> K,
     variantEndec: Endec<K>,
-    variantKey: String
+    variantKey: String = "type"
 ): StructEndec<T> {
     return object : StructEndec<T> {
         override fun encodeStruct(

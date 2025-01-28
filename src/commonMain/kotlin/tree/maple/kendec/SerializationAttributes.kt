@@ -1,4 +1,9 @@
+@file:JsExport
+
+
 package tree.maple.kendec
+
+import kotlin.js.JsExport
 
 object SerializationAttributes {
     /**

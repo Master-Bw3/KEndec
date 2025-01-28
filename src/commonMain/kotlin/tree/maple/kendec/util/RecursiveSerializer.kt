@@ -1,6 +1,9 @@
+@file:JsExport
+
 package tree.maple.kendec.util
 
 import tree.maple.kendec.Serializer
+import kotlin.js.JsExport
 import kotlin.js.JsName
 
 /**

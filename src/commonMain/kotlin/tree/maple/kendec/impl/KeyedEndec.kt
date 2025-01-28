@@ -1,6 +1,8 @@
+@file:JsExport
 package tree.maple.kendec.impl
 
 import tree.maple.kendec.Endec
+import kotlin.js.JsExport
 
 class KeyedEndec<F>(
     private val key: String,

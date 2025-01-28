@@ -1,8 +1,10 @@
+@file:JsExport
 package tree.maple.kendec.format.edm
 
 import tree.maple.kendec.*
 import tree.maple.kendec.impl.KeyedEndec
 import tree.maple.kendec.util.MapCarrier
+import kotlin.js.JsExport
 
 
 class EdmMap internal constructor(private val map: MutableMap<String, EdmElement<*>?>) :

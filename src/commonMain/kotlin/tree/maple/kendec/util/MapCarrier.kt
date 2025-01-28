@@ -1,7 +1,10 @@
+@file:JsExport
 package tree.maple.kendec.util
 
 import tree.maple.kendec.SerializationContext
 import tree.maple.kendec.impl.KeyedEndec
+import kotlin.js.JsExport
+import kotlin.js.JsName
 
 interface MapCarrier {
     /**
@@ -11,6 +14,7 @@ interface MapCarrier {
      *
      * Any exceptions thrown during decoding are propagated to the caller
      */
+    @JsName("getWithErrorsWithCtx")
     fun <T> getWithErrors(ctx: SerializationContext, key: KeyedEndec<T>): T {
         throw UnsupportedOperationException("Interface default method called")
     }
@@ -22,6 +26,7 @@ interface MapCarrier {
     /**
      * Store `value` under `key` in this object's associated map
      */
+    @JsName("putWithCtx")
     fun <T> put(ctx: SerializationContext, key: KeyedEndec<T>, value: T) {
         throw UnsupportedOperationException("Interface default method called")
     }
@@ -51,6 +56,7 @@ interface MapCarrier {
      * If no such value exists *or* an exception is thrown during decoding,
      * the default value of `key` is returned
      */
+    @JsName("getWithCtx")
     fun <T> get(ctx: SerializationContext, key: KeyedEndec<T>): T {
         return try {
             this.getWithErrors(ctx, key)
@@ -72,6 +78,7 @@ interface MapCarrier {
      * If `value` is not `null`, store it under `key` in this
      * object's associated map
      */
+    @JsName("putIfNotNullCtx")
     fun <T> putIfNotNull(ctx: SerializationContext, key: KeyedEndec<T>, value: T?) {
         if (value == null) return
         this.put(ctx, key, value)
@@ -88,6 +95,7 @@ interface MapCarrier {
      *
      * Importantly, this does not copy the value itself - be careful with mutable types
      */
+    @JsName("copyWithCtx")
     fun <T> copy(ctx: SerializationContext, key: KeyedEndec<T>, other: MapCarrier) {
         other.put(ctx, key, this.get(ctx, key))
     }
@@ -100,6 +108,7 @@ interface MapCarrier {
      * Like [.copy], but only if this object's associated map
      * has a value stored under `key`
      */
+    @JsName("copyIfPresentWithCtx")
     fun <T> copyIfPresent(ctx: SerializationContext, key: KeyedEndec<T>, other: MapCarrier) {
         if (!this.has(key)) return
         this.copy(ctx, key, other)
@@ -113,6 +122,7 @@ interface MapCarrier {
      * Get the value stored under `key` in this object's associated map, apply
      * `mutator` to it and store the result under `key`
      */
+    @JsName("mutateWithCtx")
     fun <T> mutate(ctx: SerializationContext, key: KeyedEndec<T>, mutator: (T) -> T) {
         this.put(ctx, key, mutator(this.get(ctx, key)))
     }

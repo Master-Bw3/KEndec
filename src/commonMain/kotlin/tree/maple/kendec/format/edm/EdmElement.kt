@@ -1,8 +1,11 @@
+@file:JsExport
 package tree.maple.kendec.format.edm
 
 import tree.maple.kendec.util.*
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlin.js.JsExport
+import kotlin.js.JsName
 
 
 open class EdmElement<T : Any> internal constructor(private val value: T, private val type: Type) {
@@ -209,6 +212,7 @@ open class EdmElement<T : Any> internal constructor(private val value: T, privat
             return optional(OptionalOfNullable(value))
         }
 
+        @JsName("fromOptional")
         fun optional(value: Optional<EdmElement<*>>): EdmElement<Optional<EdmElement<*>>> {
             if (value.isEmpty()) return EMPTY
 

@@ -1,3 +1,4 @@
+@file:JsExport
 package tree.maple.kendec.format.edm
 
 import okio.Buffer
@@ -6,6 +7,7 @@ import okio.internal.commonAsUtf8ToByteArray
 import tree.maple.kendec.util.Optional
 import tree.maple.kendec.util.OptionalOf
 import tree.maple.kendec.util.OptionalOfEmpty
+import kotlin.js.JsExport
 
 object EdmIo {
     @Throws(IOException::class)

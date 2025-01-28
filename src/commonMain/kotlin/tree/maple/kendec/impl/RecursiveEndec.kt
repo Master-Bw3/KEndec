@@ -1,9 +1,11 @@
+@file:JsExport
 package tree.maple.kendec.impl
 
 import tree.maple.kendec.Deserializer
 import tree.maple.kendec.Endec
 import tree.maple.kendec.SerializationContext
 import tree.maple.kendec.Serializer
+import kotlin.js.JsExport
 
 class RecursiveEndec<T>(builder: (Endec<T>) -> Endec<T>) : Endec<T> {
     val endec: Endec<T> = builder(this)

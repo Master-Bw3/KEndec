@@ -1,7 +1,11 @@
+@file:JsExport
+
+
 package tree.maple.kendec
 
 import tree.maple.kendec.SerializationAttribute.WithValue
 import tree.maple.kendec.impl.MissingAttributeValueException
+import kotlin.js.JsExport
 
 class SerializationContext private constructor(
     attributeValues: Map<SerializationAttribute, Any?>,

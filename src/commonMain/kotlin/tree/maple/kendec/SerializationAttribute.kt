@@ -1,4 +1,9 @@
+@file:JsExport
+
+
 package tree.maple.kendec
+
+import kotlin.js.JsExport
 
 abstract class SerializationAttribute protected constructor(val name: String) {
     class Marker(name: String) : SerializationAttribute(name), Instance {

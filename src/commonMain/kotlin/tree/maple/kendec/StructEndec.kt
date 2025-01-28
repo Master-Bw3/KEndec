@@ -1,6 +1,10 @@
+@file:JsExport
+
+
 package tree.maple.kendec
 
 import tree.maple.kendec.impl.StructField
+import kotlin.js.JsExport
 
 
 /**

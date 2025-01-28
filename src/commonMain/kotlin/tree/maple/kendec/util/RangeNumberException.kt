@@ -1,4 +1,8 @@
+@file:JsExport
+
 package tree.maple.kendec.util
+
+import kotlin.js.JsExport
 
 class RangeNumberException(val n: Number, val lowerBound: Number?, val upperBound: Number?) : RuntimeException(
     createMsg(

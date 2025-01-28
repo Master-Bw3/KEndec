@@ -1,3 +1,4 @@
+@file:JsExport
 package tree.maple.kendec.util
 
 

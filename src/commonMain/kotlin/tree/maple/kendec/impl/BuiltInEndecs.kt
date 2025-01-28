@@ -1,3 +1,4 @@
+@file:JsExport
 package tree.maple.kendec.impl
 
 import com.benasher44.uuid.Uuid
@@ -6,6 +7,8 @@ import tree.maple.kendec.Endec
 import tree.maple.kendec.PrimitiveEndecs
 import tree.maple.kendec.SerializationAttributes
 import tree.maple.kendec.ifAttr
+import kotlin.js.JsExport
+import kotlin.js.JsName
 
 object BuiltInEndecs {
     // --- Java Types ---
@@ -53,6 +56,7 @@ object BuiltInEndecs {
             )
     }
 
+    @JsName("vector3Endec")
     fun <C, V> vectorEndec(
         name: String,
         componentEndec: Endec<C>,
@@ -69,6 +73,7 @@ object BuiltInEndecs {
             )
     }
 
+    @JsName("vector4Endec")
     fun <C, V> vectorEndec(
         name: String,
         componentEndec: Endec<C>,

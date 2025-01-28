@@ -1,8 +1,10 @@
+@file:JsExport
 package tree.maple.kendec.format.edm
 
 import okio.Buffer
 import okio.IOException
 import tree.maple.kendec.*
+import kotlin.js.JsExport
 
 
 class EdmEndec private constructor() : Endec<EdmElement<*>> {

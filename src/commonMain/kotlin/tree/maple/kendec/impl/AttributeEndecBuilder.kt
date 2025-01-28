@@ -1,6 +1,9 @@
+@file:JsExport
 package tree.maple.kendec.impl
 
 import tree.maple.kendec.*
+import kotlin.js.JsExport
+import kotlin.js.JsName
 
 
 class AttributeEndecBuilder<T>(endec: Endec<T>, attribute: SerializationAttribute) {
@@ -8,10 +11,6 @@ class AttributeEndecBuilder<T>(endec: Endec<T>, attribute: SerializationAttribut
 
     init {
         branches[attribute] = endec
-    }
-
-    fun orElseIf(endec: Endec<T>, attribute: SerializationAttribute): AttributeEndecBuilder<T> {
-        return orElseIf(attribute, endec)
     }
 
     fun orElseIf(attribute: SerializationAttribute, endec: Endec<T>): AttributeEndecBuilder<T> {

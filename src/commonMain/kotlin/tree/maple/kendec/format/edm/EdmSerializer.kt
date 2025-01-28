@@ -1,3 +1,4 @@
+@file:JsExport
 package tree.maple.kendec.format.edm
 
 import tree.maple.kendec.*
@@ -5,6 +6,7 @@ import tree.maple.kendec.util.Optional
 import tree.maple.kendec.util.OptionalOfNullable
 import tree.maple.kendec.util.RecursiveSerializer
 import tree.maple.kendec.util.ifPresent
+import kotlin.js.JsExport
 
 class EdmSerializer : RecursiveSerializer<EdmElement<*>?>(null), SelfDescribedSerializer<EdmElement<*>?> {
     // ---

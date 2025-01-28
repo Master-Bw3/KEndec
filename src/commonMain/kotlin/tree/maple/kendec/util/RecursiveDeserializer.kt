@@ -1,6 +1,9 @@
+@file:JsExport
+
 package tree.maple.kendec.util
 
 import tree.maple.kendec.Deserializer
+import kotlin.js.JsExport
 
 /**
  * A template class for implementing deserializers which consume an

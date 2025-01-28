@@ -1,9 +1,11 @@
+@file:JsExport
 package tree.maple.kendec.format.edm
 
 import tree.maple.kendec.*
 import tree.maple.kendec.util.Optional
 import tree.maple.kendec.util.OptionalOfEmpty
 import tree.maple.kendec.util.OptionalOfNullable
+import kotlin.js.JsExport
 
 class LenientEdmDeserializer protected constructor(serialized: EdmElement<*>) : EdmDeserializer(serialized) {
     // ---

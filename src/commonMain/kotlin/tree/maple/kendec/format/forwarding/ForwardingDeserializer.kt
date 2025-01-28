@@ -1,7 +1,9 @@
+@file:JsExport
 package tree.maple.kendec.format.forwarding
 
 import tree.maple.kendec.*
 import tree.maple.kendec.util.Optional
+import kotlin.js.JsExport
 
 open class ForwardingDeserializer<T> protected constructor(private val delegate: Deserializer<T>) : Deserializer<T> {
     fun delegate(): Deserializer<T> {

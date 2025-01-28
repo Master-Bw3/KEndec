@@ -1,6 +1,8 @@
+@file:JsExport
 package tree.maple.kendec.impl
 
 import tree.maple.kendec.*
+import kotlin.js.JsExport
 
 class RecursiveStructEndec<T>(builder: (StructEndec<T>) -> StructEndec<T>) : StructEndec<T> {
     val structEndec: StructEndec<T> = builder(this)

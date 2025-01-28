@@ -1,7 +1,10 @@
+@file:JsExport
+
 package tree.maple.kendec
 
 import tree.maple.kendec.util.Endable
 import tree.maple.kendec.util.Optional
+import kotlin.js.JsExport
 
 interface Serializer<T> {
     fun setupContext(ctx: SerializationContext): SerializationContext {
@@ -29,7 +32,6 @@ interface Serializer<T> {
     fun struct(): StructSerializer
 
     fun result(): T
-
 }
 
 interface SequenceSerializer<E> : Endable {
@@ -41,9 +43,5 @@ interface MapSerializer<V> : Endable {
 }
 
 interface StructSerializer : Endable {
-    fun <F> field(name: String, ctx: SerializationContext, endec: Endec<F>, value: F): StructSerializer {
-        return field(name, ctx, endec, value, false)
-    }
-
-    fun <F> field(name: String, ctx: SerializationContext, endec: Endec<F>, value: F, mayOmit: Boolean): StructSerializer
+    fun <F> field(name: String, ctx: SerializationContext, endec: Endec<F>, value: F, mayOmit: Boolean = false): StructSerializer
 }

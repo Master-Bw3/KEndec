@@ -1,6 +1,8 @@
+@file:JsExport
 package tree.maple.kendec.impl
 
 import tree.maple.kendec.*
+import kotlin.js.JsExport
 import kotlin.jvm.JvmOverloads
 
 open class StructField<S, F> @JvmOverloads constructor(
