@@ -348,13 +348,13 @@ fun <T> unitEndecOf(instance: () -> T): StructEndec<T> {
  * with string keys, the resulting endec's serialized representation
  * is a list of key-value pairs
  */
-fun <K, V> mapEndecOf(keyEndec: Endec<K?>, valueEndec: Endec<V?>): Endec<Map<K?, V?>> {
+fun <K, V> mapEndecOf(keyEndec: Endec<K>, valueEndec: Endec<V>): Endec<Map<K, V>> {
     return StructEndecBuilder.of(
-        keyEndec.fieldOf("k") { it?.first },
-        valueEndec.fieldOf("v") { it?.second }
-    ) { k: K?, v: V? -> k to v }.listOf().xmap({ entries: List<Pair<K?, V?>?> ->
+        keyEndec.fieldOf("k") { it.first },
+        valueEndec.fieldOf("v") { it.second }
+    ) { k: K, v: V -> k to v }.listOf().xmap({ entries: List<Pair<K, V>> ->
         entries.filterNotNull().toMap()
-    }, { kvMap: Map<K?, V?> -> kvMap.entries.toList().map { it.key to it.value } })
+    }, { kvMap: Map<K, V> -> kvMap.entries.toList().map { it.key to it.value } })
 }
 
 /**
