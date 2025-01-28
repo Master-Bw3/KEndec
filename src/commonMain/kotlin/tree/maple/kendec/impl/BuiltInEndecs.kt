@@ -3,21 +3,22 @@ package tree.maple.kendec.impl
 import com.benasher44.uuid.Uuid
 import com.benasher44.uuid.uuidFrom
 import tree.maple.kendec.Endec
+import tree.maple.kendec.PrimitiveEndecs
 import tree.maple.kendec.SerializationAttributes
+import tree.maple.kendec.ifAttr
 
 object BuiltInEndecs {
     // --- Java Types ---
-    val INT_ARRAY: Endec<IntArray> = Endec.INT.listOf()
+    val INT_ARRAY: Endec<IntArray> = PrimitiveEndecs.INT.listOf()
         .xmap({ list -> list.toIntArray() }, { ints -> ints.toList() })
 
-    val LONG_ARRAY: Endec<LongArray> = Endec.LONG.listOf()
+    val LONG_ARRAY: Endec<LongArray> = PrimitiveEndecs.LONG.listOf()
         .xmap({ list -> list.toLongArray() },
             { longs -> longs.toList() })
     
-    val Uuid: Endec<Uuid> = Endec
-        .ifAttr(
+    val Uuid: Endec<Uuid> = ifAttr(
             SerializationAttributes.HUMAN_READABLE,
-            Endec.STRING.xmap({ name: String -> uuidFrom(name) }, { it.toString() })
+            PrimitiveEndecs.STRING.xmap({ name: String -> uuidFrom(name) }, { it.toString() })
         ).orElse(
             INT_ARRAY.xmap({ obj: IntArray -> toUuid(obj) }, BuiltInEndecs::toIntArray)
         )

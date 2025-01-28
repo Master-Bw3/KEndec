@@ -57,15 +57,15 @@ open class ForwardingDeserializer<T> protected constructor(private val delegate:
         return delegate.readOptional(ctx, endec)
     }
 
-    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>): Deserializer.Sequence<E> {
+    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>): SequenceDeserializer<E> {
         return delegate.sequence(ctx, elementEndec)
     }
 
-    override fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>): Deserializer.Map<V> {
+    override fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>): MapDeserializer<V> {
         return delegate.map(ctx, valueEndec)
     }
 
-    override fun struct(): Deserializer.Struct {
+    override fun struct(): StructDeserializer {
         return delegate.struct()
     }
 

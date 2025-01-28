@@ -9,18 +9,18 @@ import tree.maple.kendec.Utils.make
 import tree.maple.kendec.format.gson.GsonSerializer
 import tree.maple.kendec.impl.StructEndecBuilder
 
-class FlatStructFieldTests {
+class FlatStructDeserializerSerializerFieldTests {
     @Test
     @DisplayName("encode child class to json")
     fun encodeChildClassToJson() {
         val fieldsEndec = StructEndecBuilder.of(
-            Endec.STRING.fieldOf("a_field") { o -> o.aField },
-            Endec.INT.fieldOf("another_field") { `object` -> `object`.anotherField }
+            PrimitiveEndecs.STRING.fieldOf("a_field") { o -> o.aField },
+            PrimitiveEndecs.INT.fieldOf("another_field") { `object` -> `object`.anotherField }
         ) { aField: String, anotherField: Int -> ParentData(aField, anotherField) }
 
         val childClassEndec: StructEndec<ChildClass> = StructEndecBuilder.of(
             fieldsEndec.flatFieldOf { obj: ParentClass -> obj.parentData() },
-            Endec.DOUBLE.listOf().fieldOf("third_field") { o -> o.thirdField }
+            PrimitiveEndecs.DOUBLE.listOf().fieldOf("third_field") { o -> o.thirdField }
         ) { parentData, thirdField -> ChildClass(parentData.aField, parentData.anotherField, thirdField) }
 
         val encodedElement =
@@ -46,18 +46,18 @@ class FlatStructFieldTests {
     @DisplayName("encode grandchild class to json")
     fun encodeGrandChildClassToJson() {
         val fieldsEndec = StructEndecBuilder.of(
-            Endec.STRING.fieldOf("a_field") { `object` -> `object`.aField },
-            Endec.INT.fieldOf("another_field") { `object` -> `object`.anotherField }
+            PrimitiveEndecs.STRING.fieldOf("a_field") { `object` -> `object`.aField },
+            PrimitiveEndecs.INT.fieldOf("another_field") { `object` -> `object`.anotherField }
         ) { aField: String, anotherField: Int -> ParentData(aField, anotherField) }
 
         val childClassEndec: StructEndec<ChildClass> = StructEndecBuilder.of(
             fieldsEndec.flatFieldOf { obj: ParentClass -> obj.parentData() },
-            Endec.DOUBLE.listOf().fieldOf("third_field") { o -> o.thirdField }
+            PrimitiveEndecs.DOUBLE.listOf().fieldOf("third_field") { o -> o.thirdField }
         ) { parentData, thirdField -> ChildClass(parentData.aField, parentData.anotherField, thirdField) }
 
         val grandChildClassEndec: StructEndec<GrandchildClass> = StructEndecBuilder.of(
             childClassEndec.flatInheritedFieldOf(),
-            Endec.BOOLEAN.fieldOf("bruh") { o -> o.bruh }
+            PrimitiveEndecs.BOOLEAN.fieldOf("bruh") { o -> o.bruh }
         ) { childClass, thirdField ->
             GrandchildClass(
                 childClass.aField,

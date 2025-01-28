@@ -1,9 +1,6 @@
 package tree.maple.kendec.format.forwarding
 
-import tree.maple.kendec.Endec
-import tree.maple.kendec.SelfDescribedSerializer
-import tree.maple.kendec.SerializationContext
-import tree.maple.kendec.Serializer
+import tree.maple.kendec.*
 import tree.maple.kendec.util.Optional
 
 open class ForwardingSerializer<T> protected constructor(private val delegate: Serializer<T>) : Serializer<T> {
@@ -60,15 +57,15 @@ open class ForwardingSerializer<T> protected constructor(private val delegate: S
         delegate.writeOptional(ctx, endec, optional)
     }
 
-    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>, size: Int): Serializer.Sequence<E> {
+    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>, size: Int): SequenceSerializer<E> {
         return delegate.sequence(ctx, elementEndec, size)
     }
 
-    override fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>, size: Int): Serializer.Map<V> {
+    override fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>, size: Int): MapSerializer<V> {
         return delegate.map(ctx, valueEndec, size)
     }
 
-    override fun struct(): Serializer.Struct {
+    override fun struct(): StructSerializer {
         return delegate.struct()
     }
 

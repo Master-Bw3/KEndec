@@ -15,14 +15,12 @@ import tree.maple.kendec.format.gson.GsonDeserializer
 import tree.maple.kendec.format.gson.GsonEndec
 import tree.maple.kendec.format.gson.GsonSerializer
 import tree.maple.kendec.util.RangeNumberException
-import kotlin.jvm.functions.Function0
-import kotlin.jvm.functions.Function1
 
 class MiscTests {
     @Test
     @DisplayName("xmap string to codepoints")
     fun xmapStringToCodePoints() {
-        val codepointEndec = Endec.SHORT.listOf()
+        val codepointEndec = PrimitiveEndecs.SHORT.listOf()
             .xmap(
                 { shorts ->
                     val chars = CharArray(shorts.size)
@@ -81,16 +79,16 @@ class MiscTests {
     fun rangedNums() {
         Assertions.assertEquals(
             JsonPrimitive(-2),
-            Endec.clamped(Endec.INT, -2, 10).encodeFully(GsonSerializer::of, -10)
+            PrimitiveEndecs.INT.clamped(-2, 10).encodeFully(GsonSerializer::of, -10)
         )
 
         Assertions.assertEquals(
             JsonPrimitive(10),
-            Endec.clamped(Endec.INT, 0, 10).encodeFully(GsonSerializer::of, 15)
+            PrimitiveEndecs.INT.clamped(0, 10).encodeFully(GsonSerializer::of, 15)
         )
 
         Assertions.assertThrows(RangeNumberException::class.java) {
-            Endec.ranged(Endec.FLOAT, -2f, -0.25f, true).encodeFully(GsonSerializer::of, 0.0f)
+            PrimitiveEndecs.FLOAT.ranged(-2f, -0.25f, true).encodeFully(GsonSerializer::of, 0.0f)
         }
     }
 
@@ -100,9 +98,9 @@ class MiscTests {
         val attr1 = SerializationAttribute.marker("attr1")
         val attr2 = SerializationAttribute.marker("attr2")
 
-        val endec = Endec.ifAttr(attr1, Endec.BYTE as Endec<Number>)
-            .orElseIf(attr2, Endec.INT as Endec<Number>)
-            .orElse(Endec.LONG as Endec<Number>)
+        val endec = ifAttr(attr1, PrimitiveEndecs.BYTE as Endec<Number>)
+            .orElseIf(attr2, PrimitiveEndecs.INT as Endec<Number>)
+            .orElse(PrimitiveEndecs.LONG as Endec<Number>)
 
         Assertions.assertEquals(
             EdmElement.Type.I8,

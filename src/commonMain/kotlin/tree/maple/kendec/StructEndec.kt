@@ -1,6 +1,5 @@
 package tree.maple.kendec
 
-
 import tree.maple.kendec.impl.StructField
 
 
@@ -12,9 +11,9 @@ import tree.maple.kendec.impl.StructField
  * and composability which allows [Endec.dispatchedStruct] to work
  */
 interface StructEndec<T> : Endec<T> {
-    fun encodeStruct(ctx: SerializationContext, serializer: Serializer<*>, struct: Serializer.Struct, value: T)
+    fun encodeStruct(ctx: SerializationContext, serializer: Serializer<*>, struct: StructSerializer, value: T)
 
-    fun decodeStruct(ctx: SerializationContext, deserializer: Deserializer<*>, struct: Deserializer.Struct): T
+    fun decodeStruct(ctx: SerializationContext, deserializer: Deserializer<*>, struct: StructDeserializer): T
 
     override fun encode(ctx: SerializationContext, serializer: Serializer<*>, value: T) {
         serializer.struct().use { struct ->
@@ -35,8 +34,8 @@ interface StructEndec<T> : Endec<T> {
     }
 
     override fun <R> xmap(to: (T) -> R, from: (R) -> T): StructEndec<R> {
-        return of(
-            { ctx: SerializationContext, serializer: Serializer<*>, struct: Serializer.Struct, value: R ->
+        return structEndecOf(
+            { ctx: SerializationContext, serializer: Serializer<*>, struct: StructSerializer, value: R ->
                 this@StructEndec.encodeStruct(
                     ctx,
                     serializer,
@@ -44,7 +43,7 @@ interface StructEndec<T> : Endec<T> {
                     from(value)
                 )
             },
-            { ctx: SerializationContext, deserializer: Deserializer<*>, struct: Deserializer.Struct ->
+            { ctx: SerializationContext, deserializer: Deserializer<*>, struct: StructDeserializer ->
                 to(
                     this@StructEndec.decodeStruct(ctx, deserializer, struct)!!
                 )
@@ -56,8 +55,8 @@ interface StructEndec<T> : Endec<T> {
         to: (SerializationContext, T) -> R,
         from: (SerializationContext, R) -> T
     ): Endec<R> {
-        return of(
-            { ctx: SerializationContext, serializer: Serializer<*>, struct: Serializer.Struct, value: R ->
+        return structEndecOf(
+            { ctx: SerializationContext, serializer: Serializer<*>, struct: StructSerializer, value: R ->
                 this@StructEndec.encodeStruct(
                     ctx,
                     serializer,
@@ -65,7 +64,7 @@ interface StructEndec<T> : Endec<T> {
                     from(ctx, value)
                 )
             },
-            { ctx: SerializationContext, deserializer: Deserializer<*>, struct: Deserializer.Struct ->
+            { ctx: SerializationContext, deserializer: Deserializer<*>, struct: StructDeserializer ->
                 to(
                     ctx,
                     this@StructEndec.decodeStruct(ctx, deserializer, struct)!!
@@ -75,8 +74,8 @@ interface StructEndec<T> : Endec<T> {
     }
 
     fun structuredCatchErrors(decodeOnError: StructuredDecoderWithError<T>): StructEndec<T> {
-        return of(
-            { ctx: SerializationContext, serializer: Serializer<*>, struct: Serializer.Struct, value: T ->
+        return structEndecOf(
+            { ctx: SerializationContext, serializer: Serializer<*>, struct: StructSerializer, value: T ->
                 this.encodeStruct(
                     ctx,
                     serializer,
@@ -84,9 +83,9 @@ interface StructEndec<T> : Endec<T> {
                     value
                 )
             }
-        ) { ctx: SerializationContext, deserializer: Deserializer<*>, struct: Deserializer.Struct ->
+        ) { ctx: SerializationContext, deserializer: Deserializer<*>, struct: StructDeserializer ->
             try {
-                return@of deserializer.tryRead<T> { deserializer1 ->
+                return@structEndecOf deserializer.tryRead<T> { deserializer1 ->
                     this.decodeStruct(
                         ctx,
                         deserializer1,
@@ -94,7 +93,7 @@ interface StructEndec<T> : Endec<T> {
                     )!!
                 }
             } catch (e: Exception) {
-                return@of decodeOnError.decodeStruct(ctx, deserializer, struct, e)
+                return@structEndecOf decodeOnError.decodeStruct(ctx, deserializer, struct, e)
             }
         }
     }
@@ -108,62 +107,48 @@ interface StructEndec<T> : Endec<T> {
             t
         })
     }
+}
 
-    fun interface StructuredEncoder<T> {
-        fun encodeStruct(ctx: SerializationContext, serializer: Serializer<*>, struct: Serializer.Struct, value: T)
-    }
+fun interface StructuredEncoder<T> {
+    fun encodeStruct(ctx: SerializationContext, serializer: Serializer<*>, struct: StructSerializer, value: T)
+}
 
-    fun interface StructuredDecoder<T> {
-        fun decodeStruct(ctx: SerializationContext, deserializer: Deserializer<*>, struct: Deserializer.Struct): T
-    }
+fun interface StructuredDecoder<T> {
+    fun decodeStruct(ctx: SerializationContext, deserializer: Deserializer<*>, struct: StructDeserializer): T
+}
 
-    fun interface StructuredDecoderWithError<T> {
-        fun decodeStruct(
-            ctx: SerializationContext?,
-            serializer: Deserializer<*>?,
-            struct: Deserializer.Struct?,
-            exception: Exception?
-        ): T
-    }
+fun interface StructuredDecoderWithError<T> {
+    fun decodeStruct(
+        ctx: SerializationContext?,
+        serializer: Deserializer<*>?,
+        struct: StructDeserializer?,
+        exception: Exception?
+    ): T
+}
 
-    companion object {
-        /**
-         * Static constructor for [StructEndec] for use when base use of such is desired, it is recommended that
-         * you use [StructEndecBuilder] as encoding and decoding of data must be kept
-         * in the same order with same field names used across both encoding and decoding or issues may arise for
-         * formats that are not Self Describing.
-         */
-        fun <T> of(encoder: StructuredEncoder<T>, decoder: StructuredDecoder<T>): StructEndec<T> {
-            return object : StructEndec<T> {
-                override fun encodeStruct(
-                    ctx: SerializationContext,
-                    serializer: Serializer<*>,
-                    struct: Serializer.Struct,
-                    value: T
-                ) {
-                    encoder.encodeStruct(ctx, serializer, struct, value)
-                }
-
-                override fun decodeStruct(
-                    ctx: SerializationContext,
-                    deserializer: Deserializer<*>,
-                    struct: Deserializer.Struct
-                ): T {
-                    return decoder.decodeStruct(ctx, deserializer, struct)
-                }
-            }
+/**
+ * Static constructor for [StructEndec] for use when base use of such is desired, it is recommended that
+ * you use [StructEndecBuilder] as encoding and decoding of data must be kept
+ * in the same order with same field names used across both encoding and decoding or issues may arise for
+ * formats that are not Self Describing.
+ */
+fun <T> structEndecOf(encoder: StructuredEncoder<T>, decoder: StructuredDecoder<T>): StructEndec<T> {
+    return object : StructEndec<T> {
+        override fun encodeStruct(
+            ctx: SerializationContext,
+            serializer: Serializer<*>,
+            struct: StructSerializer,
+            value: T
+        ) {
+            encoder.encodeStruct(ctx, serializer, struct, value)
         }
 
-
-        @Deprecated("Use {@link Endec#unit(Object)}")
-        fun <T> unit(instance: T): StructEndec<T> {
-            return Endec.unit(instance)
-        }
-
-
-        @Deprecated("Use {@link Endec#unit(Supplier)}")
-        fun <T> unit(instance: () -> T): StructEndec<T> {
-            return Endec.unit(instance)
+        override fun decodeStruct(
+            ctx: SerializationContext,
+            deserializer: Deserializer<*>,
+            struct: StructDeserializer
+        ): T {
+            return decoder.decodeStruct(ctx, deserializer, struct)
         }
     }
 }

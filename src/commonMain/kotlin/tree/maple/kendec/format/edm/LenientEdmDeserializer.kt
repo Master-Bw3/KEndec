@@ -2,7 +2,6 @@ package tree.maple.kendec.format.edm
 
 import tree.maple.kendec.*
 import tree.maple.kendec.util.Optional
-import tree.maple.kendec.util.OptionalOf
 import tree.maple.kendec.util.OptionalOfEmpty
 import tree.maple.kendec.util.OptionalOfNullable
 
@@ -56,8 +55,8 @@ class LenientEdmDeserializer protected constructor(serialized: EdmElement<*>) : 
     }
 
     //--
-    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>): Deserializer.Sequence<E> {
-        val value = value!!.value()
+    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>): tree.maple.kendec.SequenceDeserializer<E> {
+        val value = value.value()
 
         val list: MutableList<EdmElement<*>>
 
@@ -66,12 +65,12 @@ class LenientEdmDeserializer protected constructor(serialized: EdmElement<*>) : 
 
             for (b in value) list.add(EdmElement.Companion.i8(b))
         } else if (value is List<*>) {
-            list = this.value!!.cast()
+            list = this.value.cast()
         } else {
             throw IllegalStateException("Unable to handle the given value for sequence within LenientEdmDeserializer!")
         }
 
-        return Sequence<E>(ctx, elementEndec, list)
+        return SequenceDeserializer<E>(ctx, elementEndec, list)
     }
 
     companion object {

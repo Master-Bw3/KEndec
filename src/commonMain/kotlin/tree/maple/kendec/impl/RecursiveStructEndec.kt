@@ -1,9 +1,6 @@
 package tree.maple.kendec.impl
 
-import tree.maple.kendec.Deserializer
-import tree.maple.kendec.SerializationContext
-import tree.maple.kendec.Serializer
-import tree.maple.kendec.StructEndec
+import tree.maple.kendec.*
 
 class RecursiveStructEndec<T>(builder: (StructEndec<T>) -> StructEndec<T>) : StructEndec<T> {
     val structEndec: StructEndec<T> = builder(this)
@@ -11,7 +8,7 @@ class RecursiveStructEndec<T>(builder: (StructEndec<T>) -> StructEndec<T>) : Str
     override fun encodeStruct(
         ctx: SerializationContext,
         serializer: Serializer<*>,
-        struct: Serializer.Struct,
+        struct: StructSerializer,
         value: T
     ) {
         structEndec.encodeStruct(ctx, serializer, struct, value)
@@ -20,7 +17,7 @@ class RecursiveStructEndec<T>(builder: (StructEndec<T>) -> StructEndec<T>) : Str
     override fun decodeStruct(
         ctx: SerializationContext,
         deserializer: Deserializer<*>,
-        struct: Deserializer.Struct
+        struct: StructDeserializer
     ): T {
         return structEndec.decodeStruct(ctx, deserializer, struct)
     }

@@ -58,9 +58,9 @@ class EdmTests {
     fun structEncode() {
 
         val endec: StructEndec<Triple<List<Int>, String?, Map<String, Float?>?>> = StructEndecBuilder.of(
-            Endec.INT.listOf().fieldOf("ah_yes", Tri::a),
-            Endec.STRING.nullableOf().fieldOf("hmmm", Tri::b),
-            Endec.FLOAT.nullableOf().mapOf().nullableOf().fieldOf("uhhh", Tri::c)
+            PrimitiveEndecs.INT.listOf().fieldOf("ah_yes", Tri::a),
+            PrimitiveEndecs.STRING.nullableOf().fieldOf("hmmm", Tri::b),
+            PrimitiveEndecs.FLOAT.nullableOf().mapOf().nullableOf().fieldOf("uhhh", Tri::c)
         ) { a, b, c -> Triple(a, b, c) }
 
         val value: Tri = Triple(
@@ -93,9 +93,9 @@ class EdmTests {
     @Test
     fun structDecode() {
         val endec = StructEndecBuilder.of(
-            Endec.INT.listOf().fieldOf("ah_yes", Tri::a),
-            Endec.STRING.nullableOf().fieldOf("hmmm", Tri::b),
-            Endec.FLOAT.nullableOf().mapOf().nullableOf().fieldOf("uhhh", Tri::c)
+            PrimitiveEndecs.INT.listOf().fieldOf("ah_yes", Tri::a),
+            PrimitiveEndecs.STRING.nullableOf().fieldOf("hmmm", Tri::b),
+            PrimitiveEndecs.FLOAT.nullableOf().mapOf().nullableOf().fieldOf("uhhh", Tri::c)
         ) { a, b, c -> Triple(a, b, c) }
 
         val edmElement = EdmElement.map(

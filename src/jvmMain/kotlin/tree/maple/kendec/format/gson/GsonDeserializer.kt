@@ -8,8 +8,6 @@ import tree.maple.kendec.*
 import tree.maple.kendec.util.RecursiveDeserializer
 import java.util.*
 import java.util.function.Consumer
-import java.util.function.Supplier
-import kotlin.jvm.functions.Function0
 
 class GsonDeserializer protected constructor(serialized: JsonElement?) :
     RecursiveDeserializer<JsonElement?>(serialized), SelfDescribedDeserializer<JsonElement?> {
@@ -79,16 +77,16 @@ class GsonDeserializer protected constructor(serialized: JsonElement?) :
     }
 
     // ---
-    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>): Deserializer.Sequence<E> {
-        return Sequence<E>(ctx, elementEndec, value as JsonArray)
+    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>): tree.maple.kendec.SequenceDeserializer<E> {
+        return SequenceDeserializer<E>(ctx, elementEndec, value as JsonArray)
     }
 
-    override fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>): Deserializer.Map<V> {
-        return Map<V>(ctx, valueEndec, (value as JsonObject))
+    override fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>): tree.maple.kendec.MapDeserializer<V> {
+        return MapDeserializer<V>(ctx, valueEndec, (value as JsonObject))
     }
 
-    override fun struct(): Deserializer.Struct {
-        return Struct(value as JsonObject)
+    override fun struct(): tree.maple.kendec.StructDeserializer {
+        return StructDeserializer(value as JsonObject)
     }
 
     // ---
@@ -132,7 +130,7 @@ class GsonDeserializer protected constructor(serialized: JsonElement?) :
         } else if (element is JsonArray) {
             visitor.sequence(
                 ctx,
-                Endec.of<JsonElement?>({ ctx, visitor, element ->
+                endecOf<JsonElement?>({ ctx, visitor, element ->
                     this.decodeValue(
                         ctx,
                         visitor,
@@ -146,7 +144,7 @@ class GsonDeserializer protected constructor(serialized: JsonElement?) :
         } else if (element is JsonObject) {
             visitor.map(
                 ctx,
-                Endec.of<JsonElement?>( { ctx, visitor, element ->
+                endecOf<JsonElement?>( { ctx, visitor, element ->
                     this.decodeValue(
                         ctx,
                         visitor,
@@ -162,11 +160,11 @@ class GsonDeserializer protected constructor(serialized: JsonElement?) :
     }
 
     // ---
-    private inner class Sequence<V> (
+    private inner class SequenceDeserializer<V> (
         private val ctx: SerializationContext,
         private val valueEndec: Endec<V>,
         elements: JsonArray
-    ) : Deserializer.Sequence<V> {
+    ) : tree.maple.kendec.SequenceDeserializer<V> {
         private val elements: Iterator<JsonElement> = elements.iterator()
         private val size = elements.size()
 
@@ -187,11 +185,11 @@ class GsonDeserializer protected constructor(serialized: JsonElement?) :
         }
     }
 
-    private inner class Map<V> (
+    private inner class MapDeserializer<V> (
         private val ctx: SerializationContext,
         private val valueEndec: Endec<V>,
         entries: JsonObject
-    ) : Deserializer.Map<V> {
+    ) : tree.maple.kendec.MapDeserializer<V> {
         private val entries: Iterator<kotlin.collections.Map.Entry<String, JsonElement>> =
             entries.entrySet().iterator()
         private val size = entries.size()
@@ -218,7 +216,7 @@ class GsonDeserializer protected constructor(serialized: JsonElement?) :
         }
     }
 
-    private inner class Struct (private val `object`: JsonObject) : Deserializer.Struct {
+    private inner class StructDeserializer (private val `object`: JsonObject) : tree.maple.kendec.StructDeserializer {
         override fun <F> field(
             name: String,
             ctx: SerializationContext,

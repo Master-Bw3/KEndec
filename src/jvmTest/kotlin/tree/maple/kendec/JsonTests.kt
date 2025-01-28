@@ -16,7 +16,7 @@ class JsonTests {
     @DisplayName("encode string")
     fun encodeString() {
         val value = "an epic string"
-        val result = Endec.STRING.encodeFully(GsonSerializer::of, value)
+        val result = PrimitiveEndecs.STRING.encodeFully(GsonSerializer::of, value)
         println("Result: " + result + ", Type: " + result?.javaClass?.simpleName)
     }
 
@@ -26,10 +26,10 @@ class JsonTests {
 
 
         val endec= StructEndecBuilder.of(
-            Endec.STRING.fieldOf("a_field", StructObject::aField),
-            Endec.STRING.mapOf().fieldOf("a_nested_field", StructObject::aNestedField),
-            Endec.DOUBLE.listOf().fieldOf("list_moment", StructObject::listMoment),
-            Endec.STRING.nullableOf().fieldOf("another_field", StructObject::anotherField),
+            PrimitiveEndecs.STRING.fieldOf("a_field", StructObject::aField),
+            PrimitiveEndecs.STRING.mapOf().fieldOf("a_nested_field", StructObject::aNestedField),
+            PrimitiveEndecs.DOUBLE.listOf().fieldOf("list_moment", StructObject::listMoment),
+            PrimitiveEndecs.STRING.nullableOf().fieldOf("another_field", StructObject::anotherField),
             StructEndecBuilder.Function4 { aField, aNestedField, listMoment, anotherField  ->
                 StructObject(
                     aField,
@@ -115,7 +115,7 @@ class JsonTests {
     @DisplayName("omit optional field during encoding / read default during decoding")
     fun optionalFieldHandling() {
         val endec = StructEndecBuilder.of(
-            Endec.INT.optionalFieldOf("field", SingleInteger::integer) { 0 }
+            PrimitiveEndecs.INT.optionalFieldOf("field", SingleInteger::integer) { 0 }
         ) { integer -> SingleInteger(integer) }
 
         Assertions.assertEquals(JsonObject(), endec.encodeFully(GsonSerializer::of, SingleInteger(null)))

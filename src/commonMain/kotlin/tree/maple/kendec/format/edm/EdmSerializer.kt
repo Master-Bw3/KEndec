@@ -66,23 +66,23 @@ class EdmSerializer : RecursiveSerializer<EdmElement<*>?>(null), SelfDescribedSe
     }
 
     // ---
-    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>, size: Int): Serializer.Sequence<E> {
-        return Sequence<E>(elementEndec, ctx)
+    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>, size: Int): tree.maple.kendec.SequenceSerializer<E> {
+        return SequenceSerializer<E>(elementEndec, ctx)
     }
 
-    override fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>, size: Int): Serializer.Map<V> {
-        return Map<V>(valueEndec, ctx)
+    override fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>, size: Int): tree.maple.kendec.MapSerializer<V> {
+        return MapSerializer<V>(valueEndec, ctx)
     }
 
-    override fun struct(): Serializer.Struct {
-        return Struct()
+    override fun struct(): tree.maple.kendec.StructSerializer {
+        return StructSerializer()
     }
 
     // ---
-    private inner class Sequence<V> (
+    private inner class SequenceSerializer<V> (
         private val elementEndec: Endec<V>,
         private val ctx: SerializationContext
-    ) : Serializer.Sequence<V> {
+    ) : tree.maple.kendec.SequenceSerializer<V> {
         private val result: MutableList<EdmElement<*>> = ArrayList()
 
         override fun element(element: V) {
@@ -97,10 +97,10 @@ class EdmSerializer : RecursiveSerializer<EdmElement<*>?>(null), SelfDescribedSe
         }
     }
 
-    private inner class Map<V> (
+    private inner class MapSerializer<V> (
         private val valueEndec: Endec<V>,
         private val ctx: SerializationContext
-    ) : Serializer.Map<V> {
+    ) : tree.maple.kendec.MapSerializer<V> {
         private val result: MutableMap<String, EdmElement<*>> = HashMap()
 
         override fun entry(key: String, value: V) {
@@ -115,7 +115,7 @@ class EdmSerializer : RecursiveSerializer<EdmElement<*>?>(null), SelfDescribedSe
         }
     }
 
-    private inner class Struct : Serializer.Struct {
+    private inner class StructSerializer : tree.maple.kendec.StructSerializer{
         private val result: MutableMap<String, EdmElement<*>> = HashMap()
 
         override fun <F> field(
@@ -124,7 +124,7 @@ class EdmSerializer : RecursiveSerializer<EdmElement<*>?>(null), SelfDescribedSe
             endec: Endec<F>,
             value: F,
             mayOmit: Boolean
-        ): Serializer.Struct {
+        ): tree.maple.kendec.StructSerializer {
             this@EdmSerializer.frame{ encoded ->
                 endec.encode(ctx, this@EdmSerializer, value)
                 val element = encoded!!.require("struct field")

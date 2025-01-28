@@ -19,7 +19,7 @@ open class StructField<S, F> @JvmOverloads constructor(
     open fun encodeField(
         ctx: SerializationContext,
         serializer: Serializer<*>,
-        struct: Serializer.Struct,
+        struct: StructSerializer,
         instance: S
     ) {
         try {
@@ -35,7 +35,7 @@ open class StructField<S, F> @JvmOverloads constructor(
         }
     }
 
-    open fun decodeField(ctx: SerializationContext, deserializer: Deserializer<*>, struct: Deserializer.Struct): F {
+    open fun decodeField(ctx: SerializationContext, deserializer: Deserializer<*>, struct: StructDeserializer): F {
         try {
             return struct.field(this.name, ctx, this.endec, this.defaultValueFactory)
         } catch (e: Exception) {
@@ -55,7 +55,7 @@ open class StructField<S, F> @JvmOverloads constructor(
         override fun encodeField(
             ctx: SerializationContext,
             serializer: Serializer<*>,
-            struct: Serializer.Struct,
+            struct: StructSerializer,
             instance: S
         ) {
             endec().encodeStruct(ctx, serializer, struct, getter(instance))
@@ -64,7 +64,7 @@ open class StructField<S, F> @JvmOverloads constructor(
         override fun decodeField(
             ctx: SerializationContext,
             deserializer: Deserializer<*>,
-            struct: Deserializer.Struct
+            struct: StructDeserializer
         ): F {
             return endec().decodeStruct(ctx, deserializer, struct)
         }

@@ -24,25 +24,26 @@ interface Serializer<T> {
 
     fun <V> writeOptional(ctx: SerializationContext, endec: Endec<V>, optional: Optional<V & Any>)
 
-    fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>, size: Int): Sequence<E>
-    fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>, size: Int): Map<V>
-    fun struct(): Struct
+    fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>, size: Int): SequenceSerializer<E>
+    fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>, size: Int): MapSerializer<V>
+    fun struct(): StructSerializer
 
     fun result(): T
 
-    interface Sequence<E> : Endable {
-        fun element(element: E)
+}
+
+interface SequenceSerializer<E> : Endable {
+    fun element(element: E)
+}
+
+interface MapSerializer<V> : Endable {
+    fun entry(key: String, value: V)
+}
+
+interface StructSerializer : Endable {
+    fun <F> field(name: String, ctx: SerializationContext, endec: Endec<F>, value: F): StructSerializer {
+        return field(name, ctx, endec, value, false)
     }
 
-    interface Map<V> : Endable {
-        fun entry(key: String, value: V)
-    }
-
-    interface Struct : Endable {
-        fun <F> field(name: String, ctx: SerializationContext, endec: Endec<F>, value: F): Struct {
-            return field(name, ctx, endec, value, false)
-        }
-
-        fun <F> field(name: String, ctx: SerializationContext, endec: Endec<F>, value: F, mayOmit: Boolean): Struct
-    }
+    fun <F> field(name: String, ctx: SerializationContext, endec: Endec<F>, value: F, mayOmit: Boolean): StructSerializer
 }

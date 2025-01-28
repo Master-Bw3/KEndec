@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     kotlin("multiplatform") version "2.1.0"
 }
@@ -12,8 +10,6 @@ repositories {
 }
 
 kotlin {
-    jvmToolchain(17)
-
     jvm {
         withJava()
         testRuns["test"].executionTask.configure {
@@ -24,6 +20,10 @@ kotlin {
     js(IR) {
         browser()
         nodejs()
+
+        binaries.library()
+        useEsModules()
+        generateTypeScriptDefinitions()
 
         browser {
             testTask {
@@ -54,6 +54,5 @@ kotlin {
                 implementation("com.google.code.gson:gson:2.10.1")
             }
         }
-
     }
 }

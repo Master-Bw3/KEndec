@@ -7,28 +7,28 @@ open class EdmDeserializer(serialized: EdmElement<*>) : RecursiveDeserializer<Ed
     SelfDescribedDeserializer<EdmElement<*>> {
     // ---
     override fun readByte(ctx: SerializationContext): Byte {
-        return value!!.cast()
+        return value.cast()
     }
 
     override fun readShort(ctx: SerializationContext): Short {
-        return value!!.cast()
+        return value.cast()
     }
 
     override fun readInt(ctx: SerializationContext): Int {
-        return value!!.cast()
+        return value.cast()
     }
 
     override fun readLong(ctx: SerializationContext): Long {
-        return value!!.cast()
+        return value.cast()
     }
 
     // ---
     override fun readFloat(ctx: SerializationContext): Float {
-        return value!!.cast()
+        return value.cast()
     }
 
     override fun readDouble(ctx: SerializationContext): Double {
-        return value!!.cast()
+        return value.cast()
     }
 
     // ---
@@ -42,19 +42,19 @@ open class EdmDeserializer(serialized: EdmElement<*>) : RecursiveDeserializer<Ed
 
     // ---
     override fun readBoolean(ctx: SerializationContext): Boolean {
-        return value!!.cast()
+        return value.cast()
     }
 
     override fun readString(ctx: SerializationContext): String {
-        return value!!.cast()
+        return value.cast()
     }
 
     override fun readBytes(ctx: SerializationContext): ByteArray {
-        return value!!.cast()
+        return value.cast()
     }
 
     override fun <V> readOptional(ctx: SerializationContext, endec: Endec<V>): Optional<V & Any> {
-        val optional = value!!.cast<Optional<EdmElement<*>>>()
+        val optional = value.cast<Optional<EdmElement<*>>>()
         return if (optional.isPresent()) {
             frame(
                 { optional.get() },
@@ -73,16 +73,16 @@ open class EdmDeserializer(serialized: EdmElement<*>) : RecursiveDeserializer<Ed
     }
 
     // ---
-    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>): Deserializer.Sequence<E> {
-        return Sequence<E>(ctx, elementEndec, value!!.cast())
+    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>): tree.maple.kendec.SequenceDeserializer<E> {
+        return SequenceDeserializer<E>(ctx, elementEndec, value.cast())
     }
 
-    override fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>): Deserializer.Map<V> {
-        return Map<V>(ctx, valueEndec, value!!.cast())
+    override fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>): tree.maple.kendec.MapDeserializer<V> {
+        return MapDeserializer<V>(ctx, valueEndec, value.cast())
     }
 
-    override fun struct(): Deserializer.Struct {
-        return Struct(value!!.cast())
+    override fun struct(): tree.maple.kendec.StructDeserializer {
+        return StructDeserializer(value.cast())
     }
 
     // ---
@@ -103,7 +103,7 @@ open class EdmDeserializer(serialized: EdmElement<*>) : RecursiveDeserializer<Ed
             EdmElement.Type.BYTES -> visitor.writeBytes(ctx, value.cast())
             EdmElement.Type.OPTIONAL -> visitor.writeOptional(
                 ctx,
-                Endec.of<EdmElement<*>?>(
+                endecOf<EdmElement<*>?>(
                     { ctx1, serializer1, value1 -> this.visit(ctx1, serializer1, value1) },
                     { _, _ -> null }),
                 value.cast()
@@ -112,7 +112,7 @@ open class EdmDeserializer(serialized: EdmElement<*>) : RecursiveDeserializer<Ed
             EdmElement.Type.SEQUENCE -> {
                 visitor.sequence<EdmElement<*>?>(
                     ctx,
-                    Endec.of({ ctx1, visitor1, value1 ->
+                    endecOf({ ctx1, visitor1, value1 ->
                         this.visit(
                             ctx1,
                             visitor1,
@@ -127,7 +127,7 @@ open class EdmDeserializer(serialized: EdmElement<*>) : RecursiveDeserializer<Ed
             EdmElement.Type.MAP -> {
                 visitor.map<EdmElement<*>?>(
                     ctx,
-                    Endec.of({ ctx1, visitor1, value1 ->
+                    endecOf({ ctx1, visitor1, value1 ->
                         this.visit(
                             ctx1,
                             visitor1,
@@ -145,11 +145,11 @@ open class EdmDeserializer(serialized: EdmElement<*>) : RecursiveDeserializer<Ed
     }
 
     // ---
-    protected inner class Sequence<V> internal constructor(
+    protected inner class SequenceDeserializer<V> internal constructor(
         private val ctx: SerializationContext,
         private val valueEndec: Endec<V>,
         elements: List<EdmElement<*>>
-    ) : Deserializer.Sequence<V> {
+    ) : tree.maple.kendec.SequenceDeserializer<V> {
         private val elements = elements.iterator()
         private val size = elements.size
 
@@ -170,11 +170,11 @@ open class EdmDeserializer(serialized: EdmElement<*>) : RecursiveDeserializer<Ed
         }
     }
 
-    private inner class Map<V> constructor(
+    private inner class MapDeserializer<V> constructor(
         private val ctx: SerializationContext,
         private val valueEndec: Endec<V>,
         entries: kotlin.collections.Map<String, EdmElement<*>>
-    ) : Deserializer.Map<V> {
+    ) : tree.maple.kendec.MapDeserializer<V> {
         private val entries = entries.entries.iterator()
         private val size = entries.size
 
@@ -193,15 +193,15 @@ open class EdmDeserializer(serialized: EdmElement<*>) : RecursiveDeserializer<Ed
                 {
                     object : kotlin.collections.Map.Entry<String, V> {
                         override val key = entry.key
-                        override val value = valueEndec.decode(this@Map.ctx, this@EdmDeserializer)
+                        override val value = valueEndec.decode(this@MapDeserializer.ctx, this@EdmDeserializer)
                     }
                 }
             )
         }
     }
 
-    private inner class Struct constructor(private val map: kotlin.collections.Map<String, EdmElement<*>>) :
-        Deserializer.Struct {
+    private inner class StructDeserializer constructor(private val map: kotlin.collections.Map<String, EdmElement<*>>) :
+        tree.maple.kendec.StructDeserializer {
         override fun <F> field(
             name: String,
             ctx: SerializationContext,
