@@ -93,7 +93,7 @@ internal object VarInts {
         }
     }
 
-    interface ByteSupplier {
+    fun interface ByteSupplier {
         fun get(): Byte
     }
 }
