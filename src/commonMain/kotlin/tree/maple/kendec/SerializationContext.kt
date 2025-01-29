@@ -6,6 +6,7 @@ package tree.maple.kendec
 import tree.maple.kendec.SerializationAttribute.WithValue
 import tree.maple.kendec.impl.MissingAttributeValueException
 import kotlin.js.JsExport
+import kotlin.js.JsStatic
 
 class SerializationContext private constructor(
     attributeValues: Map<SerializationAttribute, Any?>,
@@ -79,15 +80,18 @@ class SerializationContext private constructor(
     companion object {
         private val EMPTY = SerializationContext(mapOf(), setOf())
 
+        @JsStatic
         fun empty(): SerializationContext {
             return EMPTY
         }
 
+        @JsStatic
         fun attributes(vararg attributes: SerializationAttribute.Instance): SerializationContext {
             if (attributes.isEmpty()) return EMPTY
             return SerializationContext(unpackAttributes(attributes), setOf())
         }
 
+        @JsStatic
         fun suppressed(vararg attributes: SerializationAttribute): SerializationContext {
             if (attributes.isEmpty()) return EMPTY
             return SerializationContext(mapOf(), attributes.toSet())
