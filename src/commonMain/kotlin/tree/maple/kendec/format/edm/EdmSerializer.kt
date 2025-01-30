@@ -7,6 +7,7 @@ import tree.maple.kendec.util.OptionalOfNullable
 import tree.maple.kendec.util.RecursiveSerializer
 import tree.maple.kendec.util.ifPresent
 import kotlin.js.JsExport
+import kotlin.js.JsStatic
 
 class EdmSerializer : RecursiveSerializer<EdmElement<*>?>(null), SelfDescribedSerializer<EdmElement<*>?> {
     // ---
@@ -144,6 +145,7 @@ class EdmSerializer : RecursiveSerializer<EdmElement<*>?>(null), SelfDescribedSe
     }
 
     companion object {
+        @JsStatic
         fun of(): EdmSerializer {
             return EdmSerializer()
         }
