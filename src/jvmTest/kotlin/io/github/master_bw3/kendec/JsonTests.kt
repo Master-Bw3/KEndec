@@ -1,0 +1,136 @@
+package io.github.master_bw3.kendec
+
+import com.google.gson.JsonArray
+import com.google.gson.JsonNull
+import com.google.gson.JsonObject
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import io.github.master_bw3.kendec.format.json.JsonDeserializer
+import io.github.master_bw3.kendec.format.json.JsonEndec
+import io.github.master_bw3.kendec.format.json.JsonSerializer
+import io.github.master_bw3.kendec.impl.StructEndecBuilder
+
+class JsonTests {
+    @Test
+    @DisplayName("encode string")
+    fun encodeString() {
+        val value = "an epic string"
+        val result = PrimitiveEndecs.STRING.encodeFully(JsonSerializer::of, value)
+        println("Result: " + result + ", Type: " + result?.javaClass?.simpleName)
+    }
+
+    @Test
+    @DisplayName("encode struct")
+    fun encodeStruct() {
+
+
+        val endec= StructEndecBuilder.of(
+            PrimitiveEndecs.STRING.fieldOf("a_field", StructObject::aField),
+            PrimitiveEndecs.STRING.mapOf().fieldOf("a_nested_field", StructObject::aNestedField),
+            PrimitiveEndecs.DOUBLE.listOf().fieldOf("list_moment", StructObject::listMoment),
+            PrimitiveEndecs.STRING.nullableOf().fieldOf("another_field", StructObject::anotherField),
+            StructEndecBuilder.Function4 { aField, aNestedField, listMoment, anotherField  ->
+                StructObject(
+                    aField,
+                    aNestedField,
+                    listMoment,
+                    anotherField
+                )
+            }
+        )
+
+        val structObject = StructObject(
+            "an epic field value",
+            Utils.make({ LinkedHashMap() }, { map: java.util.LinkedHashMap<String, String> ->
+                map["a"] = "bruh"
+                map["b"] = "nested field value, epic"
+            }),
+            java.util.List.of(1.0, 5.7, Double.MAX_VALUE),
+            "this too"
+        )
+
+        val encodedElement = endec.encodeFully(JsonSerializer::of, structObject)
+
+        Assertions.assertEquals(
+            Utils.make<JsonObject>(
+                { JsonObject() },
+                { jsonObject: JsonObject ->
+                    jsonObject.addProperty("a_field", "an epic field value")
+                    jsonObject.add(
+                        "a_nested_field",
+                        Utils.make<JsonObject>({ JsonObject() },
+                            { jsonObject1: JsonObject ->
+                                jsonObject1.addProperty("a", "bruh")
+                                jsonObject1.addProperty("b", "nested field value, epic")
+                            })
+                    )
+                    jsonObject.add(
+                        "list_moment",
+                        Utils.make<JsonArray>({ JsonArray() },
+                            { jsonArray: JsonArray ->
+                                jsonArray.add(1.0)
+                                jsonArray.add(5.7)
+                                jsonArray.add(Double.MAX_VALUE)
+                            })
+                    )
+                    jsonObject.addProperty("another_field", "this too")
+                }),
+            encodedElement
+        )
+
+        val decodedValue = endec.decodeFully(JsonDeserializer::of, encodedElement)
+
+        Assertions.assertEquals(structObject, decodedValue)
+    }
+
+    @Test
+    @DisplayName("encode json to json")
+    fun encodeJsonToJson() {
+        val json = Utils.make<JsonObject>(
+            { JsonObject() }, { jsonObject: JsonObject ->
+                jsonObject.addProperty("a field", "some json here")
+                jsonObject.add(
+                    "another field",
+                    Utils.make<JsonArray>({ JsonArray() },
+                        { jsonArray: JsonArray ->
+                            jsonArray.add(1.0)
+                            jsonArray.add(
+                                Utils.make<JsonObject>(
+                                    { JsonObject() },
+                                    { jsonObject1: JsonObject ->
+                                        jsonObject1.add("hmmm", JsonNull.INSTANCE)
+                                    })
+                            )
+                        })
+                )
+            }
+        )
+
+        val encoded = JsonEndec.INSTANCE.encodeFully(JsonSerializer::of, json)
+        Assertions.assertEquals(json, encoded)
+    }
+
+    @Test
+    @DisplayName("omit optional field during encoding / read default during decoding")
+    fun optionalFieldHandling() {
+        val endec = StructEndecBuilder.of(
+            PrimitiveEndecs.INT.optionalFieldOf("field", SingleInteger::integer) { 0 }
+        ) { integer -> SingleInteger(integer) }
+
+        Assertions.assertEquals(JsonObject(), endec.encodeFully(JsonSerializer::of, SingleInteger(null)))
+
+        Assertions.assertEquals(SingleInteger(0), endec.decodeFully(JsonDeserializer::of, JsonObject()))
+    }
+
+    @JvmRecord
+    data class SingleInteger(val integer: Int?)
+
+    @JvmRecord
+    data class StructObject(
+        val aField: String,
+        val aNestedField: Map<String, String>,
+        val listMoment: List<Double>,
+        val anotherField: String?
+    )
+}
