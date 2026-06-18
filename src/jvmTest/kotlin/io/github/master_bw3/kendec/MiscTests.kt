@@ -11,9 +11,9 @@ import io.github.master_bw3.kendec.Utils.make
 import io.github.master_bw3.kendec.format.edm.EdmDeserializer
 import io.github.master_bw3.kendec.format.edm.EdmElement
 import io.github.master_bw3.kendec.format.edm.EdmSerializer
-import io.github.master_bw3.kendec.format.json.JsonDeserializer
-import io.github.master_bw3.kendec.format.json.JsonEndec
-import io.github.master_bw3.kendec.format.json.JsonSerializer
+import io.github.master_bw3.kendec.format.gson.GsonDeserializer
+import io.github.master_bw3.kendec.format.gson.GsonEndec
+import io.github.master_bw3.kendec.format.gson.GsonSerializer
 import io.github.master_bw3.kendec.util.RangeNumberException
 
 class MiscTests {
@@ -33,7 +33,7 @@ class MiscTests {
             )
 
         val serialized =
-            codepointEndec.encodeFully(JsonSerializer::of, "a string") // jsonEncoder.convert(toJson(codepointEndec, ));
+            codepointEndec.encodeFully(GsonSerializer::of, "a string") // jsonEncoder.convert(toJson(codepointEndec, ));
         println("encoded: $serialized")
         Assertions.assertEquals(make({ JsonArray() }, { jsonArray ->
             jsonArray.add(97)
@@ -46,7 +46,7 @@ class MiscTests {
             jsonArray.add(103)
         }), serialized)
 
-        val decoded = codepointEndec.decodeFully(JsonDeserializer::of, serialized)
+        val decoded = codepointEndec.decodeFully(GsonDeserializer::of, serialized)
         println("decoded: $decoded")
         Assertions.assertEquals("a string", decoded)
     }
@@ -67,9 +67,9 @@ class MiscTests {
             )
         })
 
-        val byteBuf = JsonEndec.INSTANCE.encodeFully({ EdmSerializer.of() }, json)
+        val byteBuf = GsonEndec.INSTANCE.encodeFully({ EdmSerializer.of() }, json)
 
-        val decodedJson = JsonEndec.INSTANCE.decodeFully(EdmDeserializer::of, byteBuf!!)
+        val decodedJson = GsonEndec.INSTANCE.decodeFully(EdmDeserializer::of, byteBuf!!)
 
         Assertions.assertEquals(json, decodedJson)
     }
@@ -79,16 +79,16 @@ class MiscTests {
     fun rangedNums() {
         Assertions.assertEquals(
             JsonPrimitive(-2),
-            PrimitiveEndecs.INT.clamped(-2, 10).encodeFully(JsonSerializer::of, -10)
+            PrimitiveEndecs.INT.clamped(-2, 10).encodeFully(GsonSerializer::of, -10)
         )
 
         Assertions.assertEquals(
             JsonPrimitive(10),
-            PrimitiveEndecs.INT.clamped(0, 10).encodeFully(JsonSerializer::of, 15)
+            PrimitiveEndecs.INT.clamped(0, 10).encodeFully(GsonSerializer::of, 15)
         )
 
         Assertions.assertThrows(RangeNumberException::class.java) {
-            PrimitiveEndecs.FLOAT.ranged(-2f, -0.25f, true).encodeFully(JsonSerializer::of, 0.0f)
+            PrimitiveEndecs.FLOAT.ranged(-2f, -0.25f, true).encodeFully(GsonSerializer::of, 0.0f)
         }
     }
 

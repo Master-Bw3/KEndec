@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+
 plugins {
     kotlin("multiplatform") version "2.1.0"
     kotlin("plugin.serialization") version "2.3.20"
@@ -5,7 +7,7 @@ plugins {
 }
 
 group = "io.github.master_bw3"
-version = "1.0-SNAPSHOT"
+version = "1.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -19,7 +21,7 @@ kotlin {
 
     }
     js(IR) {
-        browser()
+        browser {}
         nodejs()
 
         binaries.library()
@@ -58,6 +60,12 @@ kotlin {
                 implementation("com.google.code.gson:gson:2.10.1")
             }
         }
+    }
+}
+
+tasks.withType<KotlinJsCompile>().configureEach {
+    compilerOptions {
+        target = "es2015"
     }
 }
 

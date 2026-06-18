@@ -10,7 +10,6 @@ import io.github.master_bw3.kendec.format.edm.EdmSerializer
 import io.github.master_bw3.kendec.impl.StructEndecBuilder
 import io.github.master_bw3.kendec.util.OptionalOf
 import io.github.master_bw3.kendec.util.OptionalOfEmpty
-import kotlin.jvm.JvmRecord
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -20,20 +19,15 @@ class EdmTests {
     fun toStringFormatting() {
         val edmElement = EdmElement.map(
             Utils.make({ LinkedHashMap() }, { innerMap ->
-                innerMap.put(
-                    "ah_yes",
-                    EdmElement.sequence(listOf(
-                        EdmElement.i32(17), EdmElement.string("a")))
-                )
+                innerMap["ah_yes"] = EdmElement.sequence(listOf(
+                    EdmElement.i32(17), EdmElement.string("a")))
                 innerMap.put("hmmm", EdmElement.optional(OptionalOfEmpty()))
-                innerMap.put(
-                    "uhhh", EdmElement.optional(
-                        EdmElement.map(
-                            Utils.make({ LinkedHashMap() }, { map ->
-                                map.put("b", EdmElement.optional(
-                                    EdmElement.f32(16.5f)))
-                            })
-                        )
+                innerMap["uhhh"] = EdmElement.optional(
+                    EdmElement.map(
+                        Utils.make({ LinkedHashMap() }, { map ->
+                            map["b"] = EdmElement.optional(
+                                EdmElement.f32(16.5f))
+                        })
                     )
                 )
             })
@@ -73,18 +67,16 @@ class EdmTests {
 
         val originalEdmElement = EdmElement.map(
             Utils.make({ LinkedHashMap() }, { innerMap ->
-                innerMap.put("ah_yes", EdmElement.sequence(listOf(
-                    EdmElement.i32(34), EdmElement.i32(35))))
-                innerMap.put("hmmm", EdmElement.optional(OptionalOf(
-                    EdmElement.string("test"))))
-                innerMap.put(
-                    "uhhh", EdmElement.optional(
-                        EdmElement.map(
-                            Utils.make({ LinkedHashMap() }, { map ->
-                                map.put("b", EdmElement.optional(
-                                    EdmElement.f32(16.5f)))
-                            })
-                        )
+                innerMap["ah_yes"] = EdmElement.sequence(listOf(
+                    EdmElement.i32(34), EdmElement.i32(35)))
+                innerMap["hmmm"] = EdmElement.optional(OptionalOf(
+                    EdmElement.string("test")))
+                innerMap["uhhh"] = EdmElement.optional(
+                    EdmElement.map(
+                        Utils.make({ LinkedHashMap() }, { map ->
+                            map["b"] = EdmElement.optional(
+                                EdmElement.f32(16.5f))
+                        })
                     )
                 )
             })
@@ -127,22 +119,16 @@ class EdmTests {
     fun edmEncodeAndDecode() {
         val edmElement = EdmElement.map(
             Utils.make({ LinkedHashMap() }, { innerMap ->
-                innerMap.put(
-                    "ah_yes",
-                    EdmElement.sequence(listOf(
-                        EdmElement.i32(17), EdmElement.string("a")))
-                )
-                innerMap.put("hmmm", EdmElement.optional(OptionalOf(
-                    EdmElement.string("test"))))
-                innerMap.put(
-                    "uhhh",
-                    EdmElement.optional(
-                        EdmElement.map(
-                            Utils.make({ LinkedHashMap() }, { map ->
-                                map.put("b", EdmElement.optional(
-                                    EdmElement.f32(16.5f)))
-                            })
-                        )
+                innerMap["ah_yes"] = EdmElement.sequence(listOf(
+                    EdmElement.i32(17), EdmElement.string("a")))
+                innerMap["hmmm"] = EdmElement.optional(OptionalOf(
+                    EdmElement.string("test")))
+                innerMap["uhhh"] = EdmElement.optional(
+                    EdmElement.map(
+                        Utils.make({ LinkedHashMap() }, { map ->
+                            map.put("b", EdmElement.optional(
+                                EdmElement.f32(16.5f)))
+                        })
                     )
                 )
             })

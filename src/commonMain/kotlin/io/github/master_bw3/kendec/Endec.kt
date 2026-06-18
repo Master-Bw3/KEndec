@@ -1,4 +1,5 @@
 @file:JsExport
+@file:OptIn(ExperimentalJsExport::class)
 
 package io.github.master_bw3.kendec
 
@@ -8,6 +9,7 @@ import io.github.master_bw3.kendec.impl.*
 import io.github.master_bw3.kendec.util.*
 import io.github.master_bw3.kendec.util.getEnumConstants
 import kotlin.js.ExperimentalJsCollectionsApi
+import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 import kotlin.js.JsName
 import kotlin.js.JsStatic
@@ -311,9 +313,9 @@ interface Endec<T> {
 }
 
 
-typealias Encoder<T> = (ctx: SerializationContext, serializer: Serializer<*>, value: T) -> Unit
+internal typealias Encoder<T> = (ctx: SerializationContext, serializer: Serializer<*>, value: T) -> Unit
 
-typealias Decoder<T> = (ctx: SerializationContext, deserializer: Deserializer<*>) -> T
+internal typealias Decoder<T> = (ctx: SerializationContext, deserializer: Deserializer<*>) -> T
 
 fun interface DecoderWithError<T> {
     fun decode(ctx: SerializationContext, serializer: Deserializer<*>, exception: Exception): T

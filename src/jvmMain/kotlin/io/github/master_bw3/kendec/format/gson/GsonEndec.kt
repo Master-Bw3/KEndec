@@ -1,8 +1,8 @@
-package tree.maple.kendec.format.gson
+package io.github.master_bw3.kendec.format.gson
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonStreamParser
-import tree.maple.kendec.*
+import io.github.master_bw3.kendec.*
 
 class GsonEndec private constructor() : Endec<JsonElement> {
     override fun encode(ctx: SerializationContext, serializer: Serializer<*>, value: JsonElement) {

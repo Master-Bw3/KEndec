@@ -1,8 +1,14 @@
 package io.github.master_bw3.kendec.format.json
 
 import io.github.master_bw3.kendec.*
+import io.github.master_bw3.kendec.util.Optional
 import io.github.master_bw3.kendec.util.RecursiveSerializer
+import io.github.master_bw3.kendec.util.ifPresentOrElse
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 
 class JsonSerializer protected constructor(private var prefix: JsonElement?) : RecursiveSerializer<JsonElement?>(null),
     SelfDescribedSerializer<JsonElement?> {
@@ -54,18 +60,18 @@ class JsonSerializer protected constructor(private var prefix: JsonElement?) : R
     }
 
     override fun writeBytes(ctx: SerializationContext, bytes: ByteArray) {
-        val result = JsonArray(bytes.size)
+        val result = ArrayList<JsonElement>(bytes.size)
         for (i in bytes.indices) {
-            result.add(bytes[i])
+            result.add(JsonPrimitive(bytes[i]))
         }
 
-        this.consume(result)
+        this.consume(JsonArray(result.toList()))
     }
 
     override fun <V> writeOptional(ctx: SerializationContext, endec: Endec<V>, optional: Optional<V & Any>) {
         optional.ifPresentOrElse(
             { value: V -> endec.encode(ctx, this, value) },
-            { this.consume(JsonNull.INSTANCE) }
+            { this.consume(JsonNull) }
         )
     }
 
@@ -87,25 +93,25 @@ class JsonSerializer protected constructor(private var prefix: JsonElement?) : R
         private val ctx: SerializationContext?,
         private val valueEndec: Endec<V>?
     ) : io.github.master_bw3.kendec.MapSerializer<V>, StructSerializer {
-        private var result: JsonObject? = null
+        private var result: MutableMap<String, JsonElement>? = null
 
         init {
             if (this@JsonSerializer.prefix != null) {
                 if (prefix is JsonObject) {
-                    this.result = prefix as JsonObject
+                    this.result = (prefix as JsonObject).toMutableMap()
                     this@JsonSerializer.prefix = null
                 } else {
-                    throw IllegalStateException("Incompatible prefix of type " + prefix?.javaClass?.simpleName + " used for JSON map/struct")
+                    throw IllegalStateException("Incompatible prefix of typex used for JSON map/struct")
                 }
             } else {
-                this.result = JsonObject()
+                this.result = mutableMapOf()
             }
         }
 
         override fun entry(key: String, value: V) {
             this@JsonSerializer.frame { encoded: EncodedValue<JsonElement?> ->
                 valueEndec?.encode(this.ctx!!, this@JsonSerializer, value)
-                this.result!!.add(key, encoded.require("map value"))
+                this.result!![key] = encoded.require("map value") ?: JsonNull
             }
         }
 
@@ -120,15 +126,15 @@ class JsonSerializer protected constructor(private var prefix: JsonElement?) : R
                 endec.encode(ctx, this@JsonSerializer, value)
                 val element = encoded.require("struct field")
 
-                if (mayOmit && element == JsonNull.INSTANCE) return@frame
-                this.result!!.add(name, element)
+                if (mayOmit && element == JsonNull) return@frame
+                this.result!![name] = element!!
             }
 
             return this
         }
 
         override fun end() {
-            this@JsonSerializer.consume(result)
+            this@JsonSerializer.consume(result?.toMap()?.let(::JsonObject))
         }
     }
 
@@ -137,35 +143,34 @@ class JsonSerializer protected constructor(private var prefix: JsonElement?) : R
         private val valueEndec: Endec<V>,
         size: Int
     ) : io.github.master_bw3.kendec.SequenceSerializer<V> {
-        private var result: JsonArray? = null
+        private var result: MutableList<JsonElement>? = null
 
         init {
             if (this@JsonSerializer.prefix != null) {
                 if (prefix is JsonArray) {
-                    this.result = prefix as JsonArray
+                    this.result = (prefix as JsonArray).toMutableList()
                     this@JsonSerializer.prefix = null
                 } else {
-                    throw IllegalStateException("Incompatible prefix of type " + prefix?.javaClass?.simpleName + " used for JSON sequence")
+                    throw IllegalStateException("Incompatible prefix used for JSON sequence")
                 }
             } else {
-                this.result = JsonArray(size)
+                this.result = ArrayList(size)
             }
         }
 
         override fun element(element: V) {
             this@JsonSerializer.frame { encoded: EncodedValue<JsonElement?> ->
                 valueEndec.encode(this.ctx, this@JsonSerializer, element)
-                this.result!!.add(encoded.require("sequence element"))
+                this.result!!.add(encoded.require("sequence element") ?: JsonNull)
             }
         }
 
         override fun end() {
-            this@JsonSerializer.consume(result)
+            this@JsonSerializer.consume(result?.toList()?.let(::JsonArray))
         }
     }
 
     companion object {
-        @JvmOverloads
         fun of(prefix: JsonElement? = null): JsonSerializer {
             return JsonSerializer(prefix)
         }

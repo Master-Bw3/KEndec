@@ -1,8 +1,10 @@
 @file:JsExport
+@file:OptIn(ExperimentalJsExport::class)
 
 package io.github.master_bw3.kendec
 
 import io.github.master_bw3.kendec.util.Optional
+import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
 
 interface Deserializer<T> {

@@ -6,17 +6,17 @@ import com.google.gson.JsonObject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import io.github.master_bw3.kendec.format.json.JsonDeserializer
-import io.github.master_bw3.kendec.format.json.JsonEndec
-import io.github.master_bw3.kendec.format.json.JsonSerializer
+import io.github.master_bw3.kendec.format.gson.GsonDeserializer
+import io.github.master_bw3.kendec.format.gson.GsonEndec
+import io.github.master_bw3.kendec.format.gson.GsonSerializer
 import io.github.master_bw3.kendec.impl.StructEndecBuilder
 
-class JsonTests {
+class GsonTests {
     @Test
     @DisplayName("encode string")
     fun encodeString() {
         val value = "an epic string"
-        val result = PrimitiveEndecs.STRING.encodeFully(JsonSerializer::of, value)
+        val result = PrimitiveEndecs.STRING.encodeFully(GsonSerializer::of, value)
         println("Result: " + result + ", Type: " + result?.javaClass?.simpleName)
     }
 
@@ -50,7 +50,7 @@ class JsonTests {
             "this too"
         )
 
-        val encodedElement = endec.encodeFully(JsonSerializer::of, structObject)
+        val encodedElement = endec.encodeFully(GsonSerializer::of, structObject)
 
         Assertions.assertEquals(
             Utils.make<JsonObject>(
@@ -79,7 +79,7 @@ class JsonTests {
             encodedElement
         )
 
-        val decodedValue = endec.decodeFully(JsonDeserializer::of, encodedElement)
+        val decodedValue = endec.decodeFully(GsonDeserializer::of, encodedElement)
 
         Assertions.assertEquals(structObject, decodedValue)
     }
@@ -107,7 +107,7 @@ class JsonTests {
             }
         )
 
-        val encoded = JsonEndec.INSTANCE.encodeFully(JsonSerializer::of, json)
+        val encoded = GsonEndec.INSTANCE.encodeFully(GsonSerializer::of, json)
         Assertions.assertEquals(json, encoded)
     }
 
@@ -118,9 +118,9 @@ class JsonTests {
             PrimitiveEndecs.INT.optionalFieldOf("field", SingleInteger::integer) { 0 }
         ) { integer -> SingleInteger(integer) }
 
-        Assertions.assertEquals(JsonObject(), endec.encodeFully(JsonSerializer::of, SingleInteger(null)))
+        Assertions.assertEquals(JsonObject(), endec.encodeFully(GsonSerializer::of, SingleInteger(null)))
 
-        Assertions.assertEquals(SingleInteger(0), endec.decodeFully(JsonDeserializer::of, JsonObject()))
+        Assertions.assertEquals(SingleInteger(0), endec.decodeFully(GsonDeserializer::of, JsonObject()))
     }
 
     @JvmRecord

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import io.github.master_bw3.kendec.Utils.make
-import io.github.master_bw3.kendec.format.json.JsonSerializer
+import io.github.master_bw3.kendec.format.gson.GsonSerializer
 import io.github.master_bw3.kendec.impl.StructEndecBuilder
 
 class FlatStructDeserializerSerializerFieldTests {
@@ -24,7 +24,7 @@ class FlatStructDeserializerSerializerFieldTests {
         ) { parentData, thirdField -> ChildClass(parentData.aField, parentData.anotherField, thirdField) }
 
         val encodedElement =
-            childClassEndec.encodeFully(JsonSerializer::of, ChildClass("a", 7, listOf(1.2, 2.4)))
+            childClassEndec.encodeFully(GsonSerializer::of, ChildClass("a", 7, listOf(1.2, 2.4)))
 
         Assertions.assertEquals(
             make({ JsonObject() }, { jsonObject ->
@@ -68,7 +68,7 @@ class FlatStructDeserializerSerializerFieldTests {
         }
 
         val encodedElement =
-            grandChildClassEndec.encodeFully(JsonSerializer::of, GrandchildClass("b", 77, listOf(3.4, 3.5), false))
+            grandChildClassEndec.encodeFully(GsonSerializer::of, GrandchildClass("b", 77, listOf(3.4, 3.5), false))
 
         Assertions.assertEquals(
             make({ JsonObject() }, { jsonObject ->

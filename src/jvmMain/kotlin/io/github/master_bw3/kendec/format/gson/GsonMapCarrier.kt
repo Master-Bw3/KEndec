@@ -1,12 +1,10 @@
-package tree.maple.kendec.format.gson
+package io.github.master_bw3.kendec.format.gson
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import tree.maple.kendec.Deserializer
-import tree.maple.kendec.SerializationContext
-import tree.maple.kendec.impl.KeyedEndec
-import tree.maple.kendec.util.MapCarrier
-import kotlin.jvm.functions.Function1
+import io.github.master_bw3.kendec.SerializationContext
+import io.github.master_bw3.kendec.impl.KeyedEndec
+import io.github.master_bw3.kendec.util.MapCarrier
 
 class GsonMapCarrier(private val `object`: JsonObject) : MapCarrier {
     override fun <T> getWithErrors(ctx: SerializationContext, key: KeyedEndec<T>): T {

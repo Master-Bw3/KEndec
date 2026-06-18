@@ -17,6 +17,7 @@ import org.gciatto.kt.math.BigDecimal
 import kotlin.collections.get
 import kotlin.text.get
 import kotlin.text.iterator
+import kotlin.use
 
 class JsonDeserializer protected constructor(serialized: JsonElement?) :
     RecursiveDeserializer<JsonElement?>(serialized), SelfDescribedDeserializer<JsonElement?> {
@@ -85,11 +86,17 @@ class JsonDeserializer protected constructor(serialized: JsonElement?) :
     }
 
     // ---
-    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>): io.github.master_bw3.kendec.SequenceDeserializer<E> {
+    override fun <E> sequence(
+        ctx: SerializationContext,
+        elementEndec: Endec<E>
+    ): io.github.master_bw3.kendec.SequenceDeserializer<E> {
         return SequenceDeserializer<E>(ctx, elementEndec, value as JsonArray)
     }
 
-    override fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>): io.github.master_bw3.kendec.MapDeserializer<V> {
+    override fun <V> map(
+        ctx: SerializationContext,
+        valueEndec: Endec<V>
+    ): io.github.master_bw3.kendec.MapDeserializer<V> {
         return MapDeserializer<V>(ctx, valueEndec, (value as JsonObject))
     }
 
@@ -104,14 +111,14 @@ class JsonDeserializer protected constructor(serialized: JsonElement?) :
 
     private fun <S> decodeValue(ctx: SerializationContext, visitor: Serializer<S>, element: JsonElement?) {
         if (element == null || (element is JsonNull)) {
-            visitor.writeOptional(ctx, JsonEndec.INSTANCE, Optional.empty())
+            visitor.writeOptional(ctx, JsonEndec.INSTANCE, OptionalOfEmpty())
         } else if (element is JsonPrimitive) {
             if (element.isString) {
                 visitor.writeString(ctx, element.content)
             } else if (element.content.toBooleanStrictOrNull() != null) {
                 visitor.writeBoolean(ctx, element.content.toBooleanStrict())
             } else {
-                val value =  BigDecimal.of(element.content)
+                val value = BigDecimal.of(element.content)
 
 
                 try {
@@ -126,7 +133,7 @@ class JsonDeserializer protected constructor(serialized: JsonElement?) :
                     } else {
                         visitor.writeLong(ctx, asLong)
                     }
-                } catch (bruh: ArithmeticException) {
+                } catch (bruh: NumberFormatException) {
                     val asDouble = value.toDouble()
 
                     if (asDouble.toFloat().toDouble() == asDouble) {
@@ -139,29 +146,33 @@ class JsonDeserializer protected constructor(serialized: JsonElement?) :
         } else if (element is JsonArray) {
             visitor.sequence(
                 ctx,
-                endecOf<JsonElement?>({ ctx, visitor, element ->
-                    this.decodeValue(
-                        ctx,
-                        visitor,
-                        element
-                    )
-                },
-                { ctx1, deserializer -> null }), element.size()).use { sequence ->
+                endecOf<JsonElement?>(
+                    { ctx, visitor, element ->
+                        this.decodeValue(
+                            ctx,
+                            visitor,
+                            element
+                        )
+                    },
+                    { ctx1, deserializer -> null }), element.count()
+            ).use { sequence ->
                 element.forEach(
                     { element: JsonElement? -> sequence.element(element) })
             }
         } else if (element is JsonObject) {
             visitor.map(
                 ctx,
-                endecOf<JsonElement?>( { ctx, visitor, element ->
-                    this.decodeValue(
-                        ctx,
-                        visitor,
-                        element
-                    )
-                },
-                { ctx1, deserializer -> null }), element.size()).use { map ->
-                element.asMap().forEach { (key: String, value: JsonElement?) -> map.entry(key, value) }
+                endecOf<JsonElement?>(
+                    { ctx, visitor, element ->
+                        this.decodeValue(
+                            ctx,
+                            visitor,
+                            element
+                        )
+                    },
+                    { ctx1, deserializer -> null }), element.count()
+            ).use { map ->
+                element.forEach { (key: String, value: JsonElement?) -> map.entry(key, value) }
             }
         } else {
             throw IllegalArgumentException("Non-standard, unrecognized JsonElement implementation cannot be decoded")
@@ -169,7 +180,7 @@ class JsonDeserializer protected constructor(serialized: JsonElement?) :
     }
 
     // ---
-    private inner class SequenceDeserializer<V> (
+    private inner class SequenceDeserializer<V>(
         private val ctx: SerializationContext,
         private val valueEndec: Endec<V>,
         elements: JsonArray
@@ -194,7 +205,7 @@ class JsonDeserializer protected constructor(serialized: JsonElement?) :
         }
     }
 
-    private inner class MapDeserializer<V> (
+    private inner class MapDeserializer<V>(
         private val ctx: SerializationContext,
         private val valueEndec: Endec<V>,
         entries: JsonObject
@@ -215,12 +226,18 @@ class JsonDeserializer protected constructor(serialized: JsonElement?) :
             val entry = entries.next()
             return this@JsonDeserializer.frame(
                 { entry.value },
-                { entry.key to valueEndec.decode(this.ctx, this@JsonDeserializer) }
+                {
+                    object : Map.Entry<String, V> {
+                        override val key = entry.key
+                        override val value = valueEndec.decode(this@MapDeserializer.ctx, this@JsonDeserializer)
+                    }
+                }
             )
         }
     }
 
-    private inner class StructDeserializer (private val `object`: JsonObject) : io.github.master_bw3.kendec.StructDeserializer {
+    private inner class StructDeserializer(private val `object`: JsonObject) :
+        io.github.master_bw3.kendec.StructDeserializer {
         override fun <F> field(
             name: String,
             ctx: SerializationContext,

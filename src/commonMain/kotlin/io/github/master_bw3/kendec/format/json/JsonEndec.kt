@@ -18,7 +18,7 @@ class JsonEndec private constructor() : Endec<JsonElement> {
     override fun decode(ctx: SerializationContext, deserializer: Deserializer<*>): JsonElement {
         if (deserializer is SelfDescribedDeserializer<*>) {
             val json: JsonSerializer = JsonSerializer.of()
-            deserializer.readAny<JsonElement>(ctx, json)
+            deserializer.readAny(ctx, json)
 
             return json.result()!!
         }

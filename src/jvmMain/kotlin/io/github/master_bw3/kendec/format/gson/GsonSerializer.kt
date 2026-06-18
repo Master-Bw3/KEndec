@@ -1,8 +1,8 @@
-package tree.maple.kendec.format.gson
+package io.github.master_bw3.kendec.format.gson
 
 import com.google.gson.*
-import tree.maple.kendec.*
-import tree.maple.kendec.util.RecursiveSerializer
+import io.github.master_bw3.kendec.*
+import io.github.master_bw3.kendec.util.RecursiveSerializer
 import java.util.*
 
 class GsonSerializer protected constructor(private var prefix: JsonElement?) : RecursiveSerializer<JsonElement?>(null),
@@ -71,15 +71,15 @@ class GsonSerializer protected constructor(private var prefix: JsonElement?) : R
     }
 
     // ---
-    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>, size: Int): tree.maple.kendec.SequenceSerializer<E> {
+    override fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>, size: Int): io.github.master_bw3.kendec.SequenceSerializer<E> {
         return SequenceSerializer<E>(ctx, elementEndec, size)
     }
 
-    override fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>, size: Int): tree.maple.kendec.MapSerializer<V> {
+    override fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>, size: Int): io.github.master_bw3.kendec.MapSerializer<V> {
         return MapSerializer<V>(ctx, valueEndec)
     }
 
-    override fun struct(): tree.maple.kendec.StructSerializer {
+    override fun struct(): io.github.master_bw3.kendec.StructSerializer {
         return MapSerializer<Any>(null, null)
     }
 
@@ -87,7 +87,7 @@ class GsonSerializer protected constructor(private var prefix: JsonElement?) : R
     private inner class MapSerializer<V> constructor(
         private val ctx: SerializationContext?,
         private val valueEndec: Endec<V>?
-    ) : tree.maple.kendec.MapSerializer<V>, tree.maple.kendec.StructSerializer {
+    ) : io.github.master_bw3.kendec.MapSerializer<V>, io.github.master_bw3.kendec.StructSerializer {
         private var result: JsonObject? = null
 
         init {
@@ -116,7 +116,7 @@ class GsonSerializer protected constructor(private var prefix: JsonElement?) : R
             endec: Endec<F>,
             value: F,
             mayOmit: Boolean
-        ): tree.maple.kendec.StructSerializer {
+        ): io.github.master_bw3.kendec.StructSerializer {
             this@GsonSerializer.frame { encoded ->
                 endec.encode(ctx, this@GsonSerializer, value)
                 val element = encoded.require("struct field")
@@ -137,7 +137,7 @@ class GsonSerializer protected constructor(private var prefix: JsonElement?) : R
         private val ctx: SerializationContext,
         private val valueEndec: Endec<V>,
         size: Int
-    ) : tree.maple.kendec.SequenceSerializer<V> {
+    ) : io.github.master_bw3.kendec.SequenceSerializer<V> {
         private var result: JsonArray? = null
 
         init {

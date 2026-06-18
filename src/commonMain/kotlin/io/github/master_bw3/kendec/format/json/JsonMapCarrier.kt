@@ -1,15 +1,15 @@
 package io.github.master_bw3.kendec.format.json
 
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
+
 import io.github.master_bw3.kendec.SerializationContext
 import io.github.master_bw3.kendec.impl.KeyedEndec
 import io.github.master_bw3.kendec.util.MapCarrier
+import kotlinx.serialization.json.JsonElement
 import kotlin.text.get
 
-class JsonMapCarrier(private val `object`: JsonObject) : MapCarrier {
+class JsonMapCarrier(private val `object`: MutableMap<String, JsonElement>) : MapCarrier {
     override fun <T> getWithErrors(ctx: SerializationContext, key: KeyedEndec<T>): T {
-        return if (`object`.has(key.key())) key.endec().decodeFully(
+        return if (`object`.containsKey(key.key())) key.endec().decodeFully(
             ctx,
             { serialized: JsonElement? ->
                 JsonDeserializer.of(serialized)
@@ -19,7 +19,7 @@ class JsonMapCarrier(private val `object`: JsonObject) : MapCarrier {
     }
 
     override fun <T> put(ctx: SerializationContext, key: KeyedEndec<T>, value: T) {
-        `object`.add(key.key(), key.endec().encodeFully(ctx, JsonSerializer::of, value))
+        key.endec().encodeFully(ctx, JsonSerializer::of, value)?.let { `object`.put(key.key(), it) }
     }
 
     override fun <T> delete(key: KeyedEndec<T>) {
@@ -27,6 +27,6 @@ class JsonMapCarrier(private val `object`: JsonObject) : MapCarrier {
     }
 
     override fun <T> has(key: KeyedEndec<T>): Boolean {
-        return `object`.has(key.key())
+        return `object`.containsKey(key.key())
     }
 }
