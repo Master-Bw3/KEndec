@@ -126,8 +126,8 @@ class EdmTests {
                 innerMap["uhhh"] = EdmElement.optional(
                     EdmElement.map(
                         Utils.make({ LinkedHashMap() }, { map ->
-                            map.put("b", EdmElement.optional(
-                                EdmElement.f32(16.5f)))
+                            map["b"] = EdmElement.optional(
+                                EdmElement.f32(16.5f))
                         })
                     )
                 )
