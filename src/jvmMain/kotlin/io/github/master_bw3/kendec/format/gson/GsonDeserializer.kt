@@ -9,7 +9,7 @@ import io.github.master_bw3.kendec.util.RecursiveDeserializer
 import java.util.*
 import java.util.function.Consumer
 
-class GsonDeserializer protected constructor(serialized: JsonElement?) :
+open class GsonDeserializer protected constructor(serialized: JsonElement?) :
     RecursiveDeserializer<JsonElement?>(serialized), SelfDescribedDeserializer<JsonElement?> {
     override fun setupContext(ctx: SerializationContext): SerializationContext {
         return super<RecursiveDeserializer>.setupContext(ctx).withAttributes(SerializationAttributes.HUMAN_READABLE)
@@ -85,7 +85,7 @@ class GsonDeserializer protected constructor(serialized: JsonElement?) :
         return MapDeserializer<V>(ctx, valueEndec, (value as JsonObject))
     }
 
-    override fun struct(): io.github.master_bw3.kendec.StructDeserializer {
+    override fun struct(ctx: SerializationContext): io.github.master_bw3.kendec.StructDeserializer {
         return StructDeserializer(value as JsonObject)
     }
 

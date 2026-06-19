@@ -99,7 +99,7 @@ class BufferDeserializer(private var buffer: Buffer) : Deserializer<Buffer> {
         return this.Map(ctx, valueEndec, this.readVarInt(ctx))
     }
 
-    override fun struct(): StructDeserializer {
+    override fun struct(ctx: SerializationContext): StructDeserializer {
         return this.Sequence<Any>(null, null, 0)
     }
 

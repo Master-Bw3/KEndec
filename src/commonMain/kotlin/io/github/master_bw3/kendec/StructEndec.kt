@@ -26,7 +26,7 @@ interface StructEndec<T> : Endec<T> {
     }
 
     override fun decode(ctx: SerializationContext, deserializer: Deserializer<*>): T {
-        return this.decodeStruct(ctx, deserializer, deserializer.struct())!!
+        return this.decodeStruct(ctx, deserializer, deserializer.struct(ctx))!!
     }
 
     fun <S> flatFieldOf(getter: (S) -> T): StructField<S, T> {

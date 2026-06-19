@@ -29,7 +29,7 @@ interface Deserializer<T> {
 
     fun <E> sequence(ctx: SerializationContext, elementEndec: Endec<E>): SequenceDeserializer<E>
     fun <V> map(ctx: SerializationContext, valueEndec: Endec<V>): MapDeserializer<V>
-    fun struct(): StructDeserializer
+    fun struct(ctx: SerializationContext): StructDeserializer
 
     fun <V> tryRead(reader: (Deserializer<T>) -> V): V
 }

@@ -69,8 +69,8 @@ open class ForwardingDeserializer<T> protected constructor(private val delegate:
         return delegate.map(ctx, valueEndec)
     }
 
-    override fun struct(): StructDeserializer {
-        return delegate.struct()
+    override fun struct(ctx: SerializationContext): StructDeserializer {
+        return delegate.struct(ctx)
     }
 
     override fun <V> tryRead(reader: (Deserializer<T>) -> V): V {

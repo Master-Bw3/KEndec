@@ -8,7 +8,7 @@ import io.github.master_bw3.kendec.util.OptionalOfEmpty
 import io.github.master_bw3.kendec.util.OptionalOfNullable
 import kotlin.js.JsExport
 
-class LenientEdmDeserializer protected constructor(serialized: EdmElement<*>) : EdmDeserializer(serialized) {
+open class LenientEdmDeserializer protected constructor(serialized: EdmElement<*>) : EdmDeserializer(serialized) {
     // ---
     override fun readByte(ctx: SerializationContext): Byte {
         return value!!.cast<Number>().toByte()

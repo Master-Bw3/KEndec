@@ -84,7 +84,7 @@ open class EdmDeserializer(serialized: EdmElement<*>) : RecursiveDeserializer<Ed
         return MapDeserializer<V>(ctx, valueEndec, value.cast())
     }
 
-    override fun struct(): io.github.master_bw3.kendec.StructDeserializer {
+    override fun struct(ctx: SerializationContext): io.github.master_bw3.kendec.StructDeserializer {
         return StructDeserializer(value.cast())
     }
 

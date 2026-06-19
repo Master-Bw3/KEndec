@@ -19,7 +19,7 @@ import kotlin.text.get
 import kotlin.text.iterator
 import kotlin.use
 
-class JsonDeserializer protected constructor(serialized: JsonElement?) :
+open class JsonDeserializer protected constructor(serialized: JsonElement?) :
     RecursiveDeserializer<JsonElement?>(serialized), SelfDescribedDeserializer<JsonElement?> {
     override fun setupContext(ctx: SerializationContext): SerializationContext {
         return super<RecursiveDeserializer>.setupContext(ctx).withAttributes(SerializationAttributes.HUMAN_READABLE)
@@ -100,7 +100,7 @@ class JsonDeserializer protected constructor(serialized: JsonElement?) :
         return MapDeserializer<V>(ctx, valueEndec, (value as JsonObject))
     }
 
-    override fun struct(): io.github.master_bw3.kendec.StructDeserializer {
+    override fun struct(ctx: SerializationContext): io.github.master_bw3.kendec.StructDeserializer {
         return StructDeserializer(value as JsonObject)
     }
 
